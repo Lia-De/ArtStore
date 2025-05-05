@@ -1,0 +1,18 @@
+:root {
+border: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+body {
+  display: flex;
+}
+
+h1 {
+    font-family: "Lavishly Yours", cursive;
+    font-weight: 600;
+    font-style: normal;
+  
+  font-size: 3.2em;
+  line-height: 1.1;
+}
