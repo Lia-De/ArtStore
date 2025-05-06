@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using ArtStoreAPI.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 namespace ArtStoreAPI.Controllers;
 
 public class AdminController : ControllerBase
@@ -27,7 +28,7 @@ public class AdminController : ControllerBase
     [Route("admin/inventory/{id}")]
     public ArtStoreInventory? GetInventory(int id)
     {
-        return _context.ArtStoreInventories.Include(t => t.Tags).FirstOrDefault(i => i.InventoryId == id);
+        return _context.ArtStoreInventories.Include(t => t.Tags).Include(m=>m.Maker).FirstOrDefault(i => i.InventoryId == id);
     }
     [HttpGet]
     [Route("admin/makers")]
@@ -63,6 +64,11 @@ public class AdminController : ControllerBase
     /// <returns></returns>
     private Maker CreateMaker(MakerDTO newMaker)
     {
+        Maker possibleMaker = _context.Makers.FirstOrDefault(m => m.Firstname == newMaker.Firstname && m.Lastname == newMaker.Lastname);
+        if (possibleMaker != null)
+        {
+            return possibleMaker;
+        }
         Maker maker = new Maker
         {
             Firstname = newMaker.Firstname,
@@ -131,15 +137,20 @@ public class AdminController : ControllerBase
     }
     [HttpPost]
     [Route("admin/addInventory")]
-    public IActionResult AddInventory(InventoryDTO newInventory)
+    public IActionResult AddInventory([FromBody]InventoryDTO newInventory)
     {
+            Console.WriteLine(newInventory.Name);
         if (newInventory == null)
         {
             return BadRequest("Invalid inventory data.");
         }
-        if (newInventory.Name == null || newInventory.Price <= 0 )
+        if (newInventory.Name.IsNullOrEmpty())
         {
-            return BadRequest("Name and Price are required.");
+            return BadRequest("Name required.");
+        }
+        if ( newInventory.Price <= 0 )
+        {
+            return BadRequest("Price must be greater than 0.");
         }
         // Check if the maker already exists, if so return that entry.
         var maker = _context.Makers.FirstOrDefault(artist => artist.MakerId == newInventory.Maker.MakerId);

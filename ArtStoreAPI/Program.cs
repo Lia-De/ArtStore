@@ -23,8 +23,23 @@ builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<AppUser>()
     .AddEntityFrameworkStores<StoreContext>();
 
+var sitePolicy = "site-policy";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(sitePolicy, builder =>
+    {
+        //builder.AllowAnyOrigin()
+        builder.WithOrigins("http://127.0.0.1:5500", "http://localhost:5173").AllowCredentials()
+               .AllowAnyHeader()
+               .AllowAnyMethod()
+               .SetIsOriginAllowed(origin => true);
+    });
+});
+
+
 var app = builder.Build();
 
+app.UseCors(sitePolicy);
 app.MapIdentityApi<AppUser>();
 
 // Configure the HTTP request pipeline.
