@@ -1,5 +1,34 @@
 #root {
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
+}
+
+.inventory-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(300px, 1fr));
+  grid-template-rows: auto;
+  gap: 1rem;
+}
+.inventory-item {
+  border: 1px solid rgb(218, 218, 218);
+  padding: 0.3em;
+  border-radius: 0.4em;
+}
+.inventory-item:hover {
+  background-color: rgb(203, 216, 214);
+}
+
+form {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  
+  gap: 0.5em;
+}
+form label {
+  font-weight: bold;
+  grid-column: 1/2;
+  text-align: right;
+}
+form input {
+  grid-column: 2/3;
 }
