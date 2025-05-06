@@ -20,7 +20,7 @@ export default function ListInventory(){
                 axios.get(`${apiUrl}/admin/inventory`)
                 .then((response) => {
                     setInventory(response.data);
-                    // console.log(response.data);
+                    console.log(response.data);
                 })
                 .catch ((err) => {
                     setError(err)
@@ -57,7 +57,6 @@ export default function ListInventory(){
               })
             .then((response) => {
                 setInventory(prev => [...prev, response.data]);
-                console.log(response.data);
             })
             .catch ((err) => {
                 console.error(err.response?.data || err.message);
@@ -72,7 +71,7 @@ export default function ListInventory(){
                 <h3>Add New Inventory</h3>
                 <label htmlFor="maker">Maker:</label>
                 <input type="text" id="maker" placeholder="Firstname" {...register("makerFirst")}/>
-                <input type="text" id="maker" placeholder="Lastname" {...register("makerLast")}/>
+                <input type="text" id="maker2" placeholder="Lastname" {...register("makerLast")}/>
                 <label htmlFor="name">Item name:</label>
                 <input type="text" id="name" {...register("name")}/>
 
@@ -80,10 +79,10 @@ export default function ListInventory(){
                 <input type="text" id="description" {...register("description")} />
 
                 <label htmlFor="quantity">Quantity:</label>
-                <input type="text" id="quantity" {...register("quantity")} />
+                <input type="number" id="quantity" {...register("quantity")} />
 
                 <label htmlFor="price">Price:</label>
-                <input type="number" id="price" {...register("price")} />
+                <input type="number" step="0.01" id="price" {...register("price")} />
 
                 <label htmlFor="imageUrl">Image URL:</label>
                 <input type="text" id="imageUrl" {...register("imageUrl")} />
@@ -97,7 +96,7 @@ export default function ListInventory(){
     }
 
     // Check to see if we have an updated item.
-    useEffect(() => {singleInventory != {} && console.log(singleInventory);}, [singleInventory]);
+    // useEffect(() => {singleInventory != {} && console.log(singleInventory);}, [singleInventory]);
 
     const updateItem = (item) => {
         setUpdating(true);
@@ -120,7 +119,7 @@ export default function ListInventory(){
     const inventoryElements = inventory.map((item) => {
         return (
             <div key={item.inventoryId} className='inventory-item'>
-                <h3>{item.name}</h3>
+                <h3>{item.name} by {item.maker?.makerId} </h3>
                 <p>{item.description}</p>
                 <p>{item.price} kr</p>
                 {item.imageUrl && <img src={item.imageUrl} alt={item.name} />}

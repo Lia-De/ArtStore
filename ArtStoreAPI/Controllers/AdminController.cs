@@ -22,7 +22,7 @@ public class AdminController : ControllerBase
     [Route("admin/inventory")]
     public List<ArtStoreInventory>? AllInventories()
     {
-        return _context.ArtStoreInventories.Include(t => t.Tags).ToList();
+        return _context.ArtStoreInventories.Include(t => t.Tags).Include(m=>m.Maker).ToList();
     }
     [HttpGet]
     [Route("admin/inventory/{id}")]
