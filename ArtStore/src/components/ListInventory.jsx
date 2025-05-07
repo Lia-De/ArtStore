@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import axios from 'axios';
 import {useForm } from 'react-hook-form';
-
+import * as Format from '../Helpers.js';
 import { UpdateInventory } from './UpdateInventory.jsx';
 import { apiUrl } from '../config.js';
 
@@ -21,13 +21,8 @@ export default function ListInventory(){
                 .then((response) => {
                     setInventory(response.data);
                     console.log(response.data);
-                })
-                .catch ((err) => {
-                    setError(err)
-                })
-                .finally(() => {
-                    setLoading(false);
-                });
+                }) .catch ((err) => { setError(err); })
+                .finally(() => {  setLoading(false); });
     }, []);
     
 
@@ -47,7 +42,7 @@ export default function ListInventory(){
                 tags: data.tags.split(",").map(tag => tag.trim()),
 
             }
-            console.log(newInventory);
+            // console.log(newInventory);
             setLoading(true);
             setError(null);
             axios.post(`${apiUrl}/admin/addInventory`, newInventory, {
@@ -62,9 +57,7 @@ export default function ListInventory(){
                 console.error(err.response?.data || err.message);
                 setError(err)
             })
-            .finally(() => {
-                setLoading(false);
-            });
+            .finally(() => { setLoading(false); });
         }
         return (
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -119,10 +112,14 @@ export default function ListInventory(){
     const inventoryElements = inventory.map((item) => {
         return (
             <div key={item.inventoryId} className='inventory-item'>
-                <h3>{item.name} by {item.maker?.makerId} </h3>
+                <h3>{item.name} by {item.maker?.firstname + ' ' +item.maker?.lastname} </h3>
                 <p>{item.description}</p>
                 <p>{item.price} kr</p>
+                <p>Quantity {item.quantity}</p>
                 {item.imageUrl && <img src={item.imageUrl} alt={item.name} />}
+                <p>Added: {Format.formatUnixTime(item.createdAt)}</p>
+                <p>Last update: {Format.formatUnixTime(item.updatedAt)}</p>
+                <p>Tags: {item.tags.join(", ")}</p>
                 <button onClick={() => updateItem(item.inventoryId) }>Update</button>
                 <button onClick={() => {}}>Delete</button>
             </div>
