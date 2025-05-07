@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 namespace ArtStoreAPI.Models;
 
@@ -10,5 +11,7 @@ public class Tag
     public DateTime UpdatedAt { get; set; }
     
     //[JsonIgnore]
-    public List<ArtStoreInventory> ArtStoreInventories { get; set; } = new List<ArtStoreInventory>();
+    public List<ArtStoreInventory> ArtStoreInventories { get; set; } = [];
+
+   
 }

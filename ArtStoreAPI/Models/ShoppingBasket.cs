@@ -5,7 +5,7 @@ public class ShoppingBasket
 {
     [Key] public int ShoppingBasketId { get; set; }
     public string UserId { get; set; } = string.Empty;
-    public List<BasketItem> BasketItems { get; set; } = new List<BasketItem>();
+    public List<BasketItem> BasketItems { get; set; } = [];
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public decimal TotalPrice { get; set; }

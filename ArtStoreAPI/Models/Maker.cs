@@ -8,7 +8,7 @@ public class Maker
     public string Lastname { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    public List<ArtStoreInventory> ArtStoreInventories { get; set; } = new List<ArtStoreInventory>();
+    public List<ArtStoreInventory> ArtStoreInventories { get; set; } = [];
 
     public string MakerName()
     {

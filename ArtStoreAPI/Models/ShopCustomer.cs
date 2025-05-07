@@ -16,8 +16,8 @@ public class ShopCustomer
     public string Country { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    public List<ShoppingBasket> ShoppingBaskets { get; set; } = new List<ShoppingBasket>();
-    public List<Order> Orders { get; set; } = new List<Order>();
+    public List<ShoppingBasket> ShoppingBaskets { get; set; } = [];
+    public List<Order> Orders { get; set; } = [];
     public string PaymentDetail { get; set; } = string.Empty; // Set dummy values from frontend
 
 

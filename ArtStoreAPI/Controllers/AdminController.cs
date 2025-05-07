@@ -2,115 +2,59 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using ArtStoreAPI.Models;
+using ArtStoreAPI.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using ArtStoreAPI.ModelsDTO;
 namespace ArtStoreAPI.Controllers;
 
-public class AdminController : ControllerBase
+public class AdminController(StoreContext context, UserManager<AppUser> userManager, AdminServices adminServices) : ControllerBase
 {
-
-    private StoreContext _context;
-
-    private readonly UserManager<AppUser> _userManager;
-    public AdminController(StoreContext context, UserManager<AppUser> userManager)
-    {
-        _context = context;
-        _userManager = userManager;
-    }
-
     [HttpGet]
     [Route("admin/inventory")]
-    public List<ArtStoreInventory>? AllInventories()
+    public List<InventoryDTO>? AllInventories()
     {
-        return _context.ArtStoreInventories.Include(t => t.Tags).Include(m=>m.Maker).ToList();
+        return context.ArtStoreInventories
+        .Include(t => t.Tags)
+        .Include(m => m.Maker)
+        .AsNoTracking()
+        .ToList()
+        .Select(inventory => inventory.ToDTO())
+        .ToList();
+
     }
     [HttpGet]
     [Route("admin/inventory/{id}")]
     public ArtStoreInventory? GetInventory(int id)
     {
-        return _context.ArtStoreInventories.Include(t => t.Tags).Include(m=>m.Maker).FirstOrDefault(i => i.InventoryId == id);
+        return context.ArtStoreInventories.Include(t => t.Tags).Include(m=>m.Maker).FirstOrDefault(i => i.InventoryId == id);
     }
     [HttpGet]
     [Route("admin/makers")]
     public List<Maker>? AllMakers()
     {
-        return _context.Makers.Include(mk => mk.ArtStoreInventories).ToList();
+        return context.Makers.Include(mk => mk.ArtStoreInventories).ToList();
     }
     [HttpGet]
     [Route("admin/maker/{id}")]
     public Maker? GetMaker(int id)
     {
-        return _context.Makers.Include(mk => mk.ArtStoreInventories).FirstOrDefault(m => m.MakerId == id);
+        return context.Makers.Include(mk => mk.ArtStoreInventories).FirstOrDefault(m => m.MakerId == id);
     }
     [HttpGet]
     [Route("admin/tags")]
     public List<Tag>? AllTags()
     {
-        return _context.Tags.ToList();
+        return context.Tags.ToList();
     }
     [HttpGet]
     [Route("admin/tag/{id}")]
     public Tag? GetTag( int id)
     {
-        return _context.Tags.Include(t => t.ArtStoreInventories).FirstOrDefault(t => t.TagId == id);
+        return context.Tags.Include(t => t.ArtStoreInventories).FirstOrDefault(t => t.TagId == id);
     }
 
 
-
-    /// <summary>
-    /// Helper method to create a new Maker, called from Endpoints
-    /// </summary>
-    /// <param name="newMaker"></param>
-    /// <returns></returns>
-    private Maker CreateMaker(MakerDTO newMaker)
-    {
-        Maker possibleMaker = _context.Makers.FirstOrDefault(m => m.Firstname == newMaker.Firstname && m.Lastname == newMaker.Lastname);
-        if (possibleMaker != null)
-        {
-            return possibleMaker;
-        }
-        Maker maker = new Maker
-        {
-            Firstname = newMaker.Firstname,
-            Lastname = newMaker.Lastname,
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now
-        };
-        _context.Makers.Add(maker);
-        _context.SaveChanges();
-        return maker;
-    }
-    /// <summary>
-    /// Helper method to create a new list of Tags given a list of strings, called from Endpoints
-    /// </summary>
-    /// <param name="tags"></param>
-    /// <returns></returns>
-    private List<Tag> CreateTags(List<string> tags)
-    {
-        List<Tag> tagList = new List<Tag>();
-        foreach (var tag in tags)
-        {
-            if (_context.Tags.Any(t => t.Name == tag))
-            {
-                var existingTag = _context.Tags.FirstOrDefault(t => t.Name == tag);
-                if (existingTag != null)
-                {
-                    tagList.Add(existingTag);
-                    continue;
-                }
-            }
-            Tag newTag = new Tag
-            {
-                Name = tag,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
-            };
-            _context.Tags.Add(newTag);
-            _context.SaveChanges();
-            tagList.Add(newTag);
-        }
-        return tagList;
-    }
 
     [HttpPost]
     [Route("admin/addMaker")]
@@ -125,13 +69,13 @@ public class AdminController : ControllerBase
             return BadRequest("Firstname and Lastname are required.");
         }
         // Check if the maker already exists, if so return that entry.
-        var possibleMaker = _context.Makers.FirstOrDefault(artist => artist.Firstname == newMaker.Firstname && artist.Lastname == newMaker.Lastname);
+        var possibleMaker = context.Makers.FirstOrDefault(artist => artist.Firstname == newMaker.Firstname && artist.Lastname == newMaker.Lastname);
         if (possibleMaker != null)
         {
             return Ok(possibleMaker);
         }
 
-        Maker maker = CreateMaker(newMaker);
+        Maker maker = adminServices.CreateMaker(newMaker);
 
         return Ok(maker);
     }
@@ -153,13 +97,13 @@ public class AdminController : ControllerBase
             return BadRequest("Price must be greater than 0.");
         }
         // Check if the maker already exists, if so return that entry.
-        var maker = _context.Makers.FirstOrDefault(artist => artist.MakerId == newInventory.Maker.MakerId);
+        var maker = context.Makers.FirstOrDefault(artist => artist.MakerId == newInventory.Maker.MakerId);
         if (maker == null)
         {
-            maker = CreateMaker(newInventory.Maker);
+            maker = adminServices.CreateMaker(newInventory.Maker);
         }
         // Format the taglist to proper tags
-        var tagList = CreateTags(newInventory.Tags);
+        var tagList = adminServices.CreateTags(newInventory.Tags);
 
 
         ArtStoreInventory inventory = new ArtStoreInventory
@@ -175,27 +119,27 @@ public class AdminController : ControllerBase
             Maker = maker
         };
 
-        _context.ArtStoreInventories.Add(inventory);
-        _context.SaveChanges();
-        return Ok(inventory);
+        context.ArtStoreInventories.Add(inventory);
+        context.SaveChanges();
+        return Ok(inventory.ToDTO());
     }
 
     [HttpPost]
     [Route("admin/inventoryRemoveTag")]
     public IActionResult InventoryRemoveTag(int inventoryId, int tagId)
     {
-        var inventory = _context.ArtStoreInventories.Include(t => t.Tags).FirstOrDefault(i => i.InventoryId == inventoryId);
+        var inventory = context.ArtStoreInventories.Include(t => t.Tags).FirstOrDefault(i => i.InventoryId == inventoryId);
         if (inventory == null)
         {
             return NotFound("Inventory not found.");
         }
-        var tag = _context.Tags.FirstOrDefault(t => t.TagId == tagId);
+        var tag = context.Tags.FirstOrDefault(t => t.TagId == tagId);
         if (tag == null)
         {
             return NotFound("Tag not found.");
         }
         inventory.Tags.Remove(tag);
-        _context.SaveChanges();
+        context.SaveChanges();
         return Ok(inventory);
     }
 }

@@ -12,8 +12,9 @@ public class ArtStoreInventory
     public string ImageUrl { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    public List<Tag> Tags { get; set; } = new List<Tag>();
+    public List<Tag> Tags { get; set; } = [];
     public Maker Maker { get; set; }
     public int CurrentlyInBaskets { get; set; } = 0;
+
 
 }
