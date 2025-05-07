@@ -115,7 +115,7 @@ export default function ListInventory(){
                 <h3>{item.name} by {item.maker?.firstname + ' ' +item.maker?.lastname} </h3>
                 <p>{item.description}</p>
                 <p>{item.price} kr</p>
-                <p>Quantity {item.quantity}</p>
+                <p>Available: {item.quantity}</p>
                 {item.imageUrl && <img src={item.imageUrl} alt={item.name} />}
                 <p>Added: {Format.formatUnixTime(item.createdAt)}</p>
                 <p>Last update: {Format.formatUnixTime(item.updatedAt)}</p>
