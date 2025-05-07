@@ -15,6 +15,27 @@ public class ArtStoreInventory
     public List<Tag> Tags { get; set; } = [];
     public Maker Maker { get; set; }
     public int CurrentlyInBaskets { get; set; } = 0;
+    public bool IsDeleted { get; private set; } = false;
 
-
+    public bool Delete()
+    {
+        if (CurrentlyInBaskets > 0)
+        {
+            return false;
+        }
+        IsDeleted = true;
+        return true;
+    }
+    public bool IsInStock()
+    {
+        return Quantity > 0;
+    }
+    public bool IsInStock(int quantity)
+    {
+        return Quantity - CurrentlyInBaskets >= quantity;
+    }
+    public bool AvailableToPurchase(int quantity)
+    {
+        return IsInStock(quantity);
+    }
 }

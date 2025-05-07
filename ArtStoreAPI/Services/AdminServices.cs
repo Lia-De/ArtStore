@@ -4,13 +4,8 @@ using ArtStoreAPI;
 using Microsoft.EntityFrameworkCore;
 using ArtStoreAPI.ModelsDTO;
 
-public class AdminServices
+public class AdminServices(StoreContext context)
 {
-    private readonly StoreContext _context;
-    public AdminServices(StoreContext context)
-    {
-        _context = context;
-    }
     /// <summary>
     /// Helper method to create a new list of Tags given a list of strings, called from Endpoints
     /// </summary>
@@ -21,9 +16,9 @@ public class AdminServices
         List<Tag> tagList = new List<Tag>();
         foreach (var tag in tags)
         {
-            if (_context.Tags.Any(t => t.Name == tag))
+            if (context.Tags.Any(t => t.Name == tag))
             {
-                var existingTag = _context.Tags.FirstOrDefault(t => t.Name == tag);
+                var existingTag = context.Tags.FirstOrDefault(t => t.Name == tag);
                 if (existingTag != null)
                 {
                     tagList.Add(existingTag);
@@ -36,8 +31,8 @@ public class AdminServices
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now
             };
-            _context.Tags.Add(newTag);
-            _context.SaveChanges();
+            context.Tags.Add(newTag);
+            context.SaveChanges();
             tagList.Add(newTag);
         }
         return tagList;
@@ -51,7 +46,7 @@ public class AdminServices
     /// <returns></returns>
     public Maker CreateMaker(MakerDTO newMaker)
     {
-        Maker possibleMaker = _context.Makers.FirstOrDefault(m => m.Firstname == newMaker.Firstname && m.Lastname == newMaker.Lastname);
+        Maker possibleMaker = context.Makers.FirstOrDefault(m => m.Firstname == newMaker.Firstname && m.Lastname == newMaker.Lastname);
         if (possibleMaker != null)
         {
             return possibleMaker;
@@ -63,58 +58,10 @@ public class AdminServices
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now
         };
-        _context.Makers.Add(maker);
-        _context.SaveChanges();
+        context.Makers.Add(maker);
+        context.SaveChanges();
         return maker;
     }
 
-
-    //public InventoryDTO InventoryToDTO(this ArtStoreInventory inventory)
-    //{
-    //    return new InventoryDTO
-    //    {
-    //        InventoryId = inventory.InventoryId,
-    //        Name = inventory.Name,
-    //        Description = inventory.Description,
-    //        Price = inventory.Price,
-    //        Quantity = inventory.Quantity,
-    //        ImageUrl = inventory.ImageUrl,
-    //        CreatedAt = new DateTimeOffset(inventory.CreatedAt).ToUnixTimeSeconds(),
-    //        UpdatedAt = new DateTimeOffset(inventory.UpdatedAt).ToUnixTimeSeconds(),
-    //        Tags = inventory.Tags.Select(t => t.Name).ToList(),
-    //        Maker = new MakerDTO
-    //        {
-    //            MakerId = inventory.Maker.MakerId,
-    //            Firstname = inventory.Maker.Firstname,
-    //            Lastname = inventory.Maker.Lastname,
-    //            CreatedAt = new DateTimeOffset(inventory.UpdatedAt).ToUnixTimeSeconds()
-    //        },
-    //        CurrentlyInBaskets = inventory.CurrentlyInBaskets
-    //    };
-    //}
-
-    //public ArtStoreInventory InventoryFromDTO(InventoryDTO dto)
-    //{
-    //    return new ArtStoreInventory
-    //    {
-    //        InventoryId = dto.InventoryId ?? 0,
-    //        Name = dto.Name,
-    //        Description = dto.Description,
-    //        Price = dto.Price,
-    //        Quantity = dto.Quantity,
-    //        ImageUrl = dto.ImageUrl,
-    //        CreatedAt = DateTimeOffset.FromUnixTimeSeconds(dto.CreatedAt).UtcDateTime,
-    //        UpdatedAt = DateTimeOffset.FromUnixTimeSeconds(dto.UpdatedAt).UtcDateTime,
-    //        Tags = CreateTags(dto.Tags),
-    //        Maker = new Maker
-    //        {
-    //            MakerId = dto.Maker.MakerId ?? 0,
-    //            Firstname = dto.Maker.Firstname,
-    //            Lastname = dto.Maker.Lastname,
-    //            CreatedAt = DateTimeOffset.FromUnixTimeSeconds(dto.Maker.CreatedAt ?? 0).UtcDateTime
-    //        },
-    //        CurrentlyInBaskets = dto.CurrentlyInBaskets
-    //    };
-    //}
 
 }

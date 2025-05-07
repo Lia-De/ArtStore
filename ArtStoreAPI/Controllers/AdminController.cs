@@ -142,4 +142,21 @@ public class AdminController(StoreContext context, UserManager<AppUser> userMana
         context.SaveChanges();
         return Ok(inventory);
     }
+    [HttpDelete]
+    [Route("admin/inventory_delete/{id}")]
+    public IActionResult DeleteInventory(int id)
+    {
+        var inventory = context.ArtStoreInventories.Include(t => t.Tags).Include(m => m.Maker).FirstOrDefault(i => i.InventoryId == id);
+        if (inventory == null)
+        {
+            return NotFound("Inventory not found.");
+        }
+        if (inventory.CurrentlyInBaskets > 0)
+        {
+            return BadRequest("Inventory cannot be deleted while it is in a basket.");
+        }
+        inventory.Delete();
+        context.SaveChanges();
+        return Ok();
+    }
 }

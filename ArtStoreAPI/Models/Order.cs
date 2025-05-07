@@ -9,8 +9,8 @@ public class Order
     [ForeignKey("ShoppingBasketId")] public required int ShoppingBasketId { get; set; }
     [ForeignKey("ShopCustomerId")] public required int ShopCustomerId { get; set; }
     public decimal TotalCost { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     public DateTime ShippedAt { get; set; }
     public decimal ShippingCost { get; set; }
 
@@ -18,19 +18,9 @@ public class Order
     {
         
     }
-    public Order(ShoppingBasket basket, int customerId, decimal shipping)
+    public Order(ShoppingBasket basket, decimal shippingCost)
     {
-        DateTime timestamp = DateTime.UtcNow;
-        
-        CreatedAt = timestamp;
-        
-        ShoppingBasketId = basket.ShoppingBasketId;
-        basket.Status = Status.Purchased;
-        basket.UpdatedAt = timestamp;
-                
-        ShopCustomerId = customerId;
-
-        ShippingCost = shipping;
-        TotalCost = basket.TotalPrice + shipping;
+        ShippingCost = shippingCost;
+        TotalCost = basket.TotalPrice + shippingCost;
     }
 }

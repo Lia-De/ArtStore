@@ -13,7 +13,7 @@ public class StoreContext: IdentityDbContext<AppUser>
     }
     
     public DbSet<ArtStoreInventory> ArtStoreInventories { get; set; }
-    public DbSet<BasketItem> BasketItems { get; set; }
+    //public DbSet<BasketItem> BasketItems { get; set; }
     public DbSet<Maker> Makers { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<ShopCustomer> ShopCustomers { get; set; }
