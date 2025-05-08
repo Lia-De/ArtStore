@@ -4,27 +4,43 @@ import {useForm } from 'react-hook-form';
 import * as Format from '../Helpers.js';
 import { UpdateInventory } from './UpdateInventory.jsx';
 import { apiUrl } from '../config.js';
+import { useAtom } from 'jotai';
+import { inventoryListAtom, makerListAtom } from '../atoms/inventoryListAtom.js';
 
 export default function ListInventory(){
     const [uiState, setUiState] = useState({
         loading: true,
         error: null,
         updating: false,
+        reload: false
     });
-    const [inventory, setInventory] = useState([]);
+    const [inventory, setInventory] = useAtom(inventoryListAtom);
+    const [makerList, setMakerList] = useAtom(makerListAtom);
     const [singleInventory, setSingleInventory] = useState({});
     const { register, handleSubmit, reset } = useForm();
 
     useEffect( () => {
-        setUiState(prev => ({...prev, loading: true}));
-        setError(null);
-                axios.get(`${apiUrl}/admin/inventory`)
-                .then((response) => {
-                    setInventory(response.data);
-                    console.log(response.data);
-                }) .catch ((err) => { setUiState(prev => ({...prev, error: err})); })
-                .finally(() => {  setUiState(prev => ({...prev, loading: false})); });
-    }, []);
+        uiState.reload && setUiState(prev => ({...prev, reload: false}));
+        setUiState(prev => ({...prev, loading: true, error: null}));
+        axios.get(`${apiUrl}/admin/inventory`)
+        .then((response) => {
+            setInventory(response.data);
+            
+        }) .catch ((err) => { 
+            setUiState(prev => ({...prev, error: err})); 
+            setInventory([]);
+        })
+        .finally(() => {  setUiState(prev => ({...prev, loading: false})); });
+        
+        setUiState(prev => ({...prev, loading: true, error: null}));
+        axios.get(`${apiUrl}/admin/makerlistDTO`)
+        .then((response) => {
+            setMakerList(response.data);
+            // console.log(response.data);
+        }) .catch ((err) => { setUiState(prev => ({...prev, error: err})); })
+        .finally(() => {  setUiState(prev => ({...prev, loading: false})); });
+
+    }, [uiState.reload]);
     
 
     function AddNewInventory(){
@@ -33,6 +49,7 @@ export default function ListInventory(){
             const newInventory = {
                 Name: data.name,
                 maker: {
+                    makerId: parseInt(data.makerId, 10),
                     firstname: data.makerFirst,
                     lastname: data.makerLast,
                 },
@@ -56,20 +73,34 @@ export default function ListInventory(){
                 }
               })
             .then((response) => {
-                setInventory(prev => [...prev, response.data]);
+                // setInventory(prev => [...prev, response.data]);
+                setUiState(prev => ({...prev, reload: true}));
             })
             .catch ((err) => {
                 console.error(err.response?.data || err.message);
                 setUiState(prev => ({...prev, error: err}));
             })
-            .finally(() => { setLoading(false); });
+            .finally(() => { setUiState(prev => ({...prev, loading: false}));});
         }
+        function MakerListElements() {
+            return (
+                <select id="maker" {...register("makerId")} >
+                    <option value="0">Select a maker</option>
+                    {makerList.map((item) => (
+                        <option key={`maker${item.makerId}`} value={item.makerId}>
+                            {item.name}
+                        </option>
+                    ))}
+                </select>)
+      }
         return (
             <form onSubmit={handleSubmit(onSubmit)}>
                 <h3>Add New Inventory</h3>
                 <label htmlFor="maker">Maker:</label>
-                <input type="text" id="maker" placeholder="Firstname" {...register("makerFirst")}/>
-                <input type="text" id="maker2" placeholder="Lastname" {...register("makerLast")}/>
+                <MakerListElements />
+                <label htmlFor="newmaker">New Maker:</label>
+                <input type="text" id="newmaker" placeholder="Firstname" {...register("makerFirst")}/>
+                <input type="text" id="newmaker2" placeholder="Lastname" {...register("makerLast")}/>
                 <label htmlFor="name">Item name:</label>
                 <input type="text" id="name" {...register("name")}/>
 
@@ -95,6 +126,7 @@ export default function ListInventory(){
 
     // Check to see if we have an updated item.
     // useEffect(() => {singleInventory != {} && console.log(singleInventory);}, [singleInventory]);
+    
 
     const updateItem = (item) => {
         
@@ -108,6 +140,7 @@ export default function ListInventory(){
         })
         .catch((err) => {
             console.error(err);
+            setSingleInventory(null);
         })
         .finally(() => {
             setUiState(prev => ({...prev, loading: false}));
@@ -136,10 +169,10 @@ export default function ListInventory(){
         <div>
             <h1>Art Store</h1>
             
-            {uiState.inventory && !uiState.updating && <h2>Inventory</h2>}
+            {inventory && !uiState.updating && <h2>Inventory</h2>}
             {uiState.loading && <p>Loading...</p>}
-            {uiState.error && <p>Error: {error.message}</p>}
-            {uiState.inventory && !uiState.updating && <>
+            {uiState.error && <p>Error: {uiState.error.message}</p>}
+            {inventory && !uiState.updating && <>
                 <div className='inventory-list'>
                     {inventoryElements}
                 </div>

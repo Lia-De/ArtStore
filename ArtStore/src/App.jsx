@@ -3,6 +3,9 @@ import { useState } from 'react'
 import './App.css'
 import { BrowserRouter, Routes, Route } from 'react-router'
 import ListInventory from './components/ListInventory.jsx'
+import Shopfront from './components/Shopfront.jsx'
+import Navbar from './components/Navbar.jsx'
+import Cart from './components/Cart.jsx'
 
 function App() {
 
@@ -10,7 +13,11 @@ function App() {
     <BrowserRouter>
     <Routes>
       {/* <Route path="/" element={<h1>Welcome to the Art Store</h1>} /> */}
-      <Route path="/admin" element={<ListInventory />} />
+      <Route element={<Navbar />} >
+        <Route path="/admin" element={<ListInventory />} />
+        <Route path="/" element={<Shopfront />} />
+        <Route path="/cart" element={<Cart />} />
+      </Route>
       </Routes>
     </BrowserRouter>
   )
