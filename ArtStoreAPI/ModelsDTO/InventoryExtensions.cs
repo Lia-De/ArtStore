@@ -12,7 +12,7 @@ public static class InventoryExtensions
             Name = inventory.Name,
             Description = inventory.Description,
             Price = inventory.Price,
-            Quantity = inventory.Quantity - inventory.CurrentlyInBaskets,
+            Quantity = inventory.Quantity,
             ImageUrl = inventory.ImageUrl,
             CreatedAt = new DateTimeOffset(inventory.CreatedAt).ToUnixTimeSeconds(),
             UpdatedAt = new DateTimeOffset(inventory.UpdatedAt).ToUnixTimeSeconds(),
