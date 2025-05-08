@@ -3,6 +3,18 @@
   text-align: center;
 }
 
+button {
+  background-color: rgb(0, 0, 0);
+  color: white;
+  border: none;
+  padding: 0.5em;
+  border-radius: 0.4em;
+  cursor: pointer;
+  font-family: "Viaoda Libre", serif;
+  font-weight: 400;
+  font-style: normal;
+  margin: 0.5em;
+}
 .inventory-list {
   display: grid;
   grid-template-columns: repeat(3, minmax(300px, 1fr));
@@ -47,12 +59,41 @@ ul.navbar-menu li {
   margin: 0 1em;
 }
 
+.inventory-details {
+  position:relative;
+}
+.inventory-item img, .cart-item img {
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+}
+
+.inventory-details img {
+  max-width: 100%;
+  max-height: 500px;
+  object-fit: cover;
+}
 .closeBtn {
+  content: 'X';
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 2em;
+  height: 2em;
   color: rgb(255, 0, 0);
   background-color: white;
-  border: 1px solid red;
-  padding: 0.5em;
-  text-align:center;
+  border: 1px dashed red;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
   border-radius: 50%;
+  font-weight: 800;
+  
+}
+
+.soldout {
+  font-variant: small-caps;
+  color: rgb(255, 0, 0);
 }

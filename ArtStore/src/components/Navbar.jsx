@@ -1,4 +1,4 @@
-import { useAtomValue } from "jotai";
+import { useAtomValue, useAtom } from "jotai";
 import { shopCustomerAtom } from "../atoms/shopCustomerAtom.js";
 import { shoppingCartAtom } from "../atoms/cartAtom.js";
 import { NavLink, Outlet } from "react-router";
@@ -6,7 +6,7 @@ import { MdScreenLockLandscape } from "react-icons/md";
 
 export const Navbar = () => {
     const {shopCustomer} = useAtomValue(shopCustomerAtom);
-    const {cart} = useAtomValue(shoppingCartAtom);
+    const [shoppingCart, setShoppingCart] = useAtom(shoppingCartAtom);
     return (
         <>
         <nav className="navbar">
@@ -19,7 +19,7 @@ export const Navbar = () => {
                 </li>
                 {shopCustomer && <li>
                     <NavLink to="/mypage" className="navbar-item">My page</NavLink></li>}
-                {cart && <li>
+                {shoppingCart && <li>
                     <NavLink to="/cart" className="navbar-item">Cart</NavLink></li>}
                 <li>
                     <NavLink to="/login" className="navbar-item">Login</NavLink>
