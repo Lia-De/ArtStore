@@ -41,6 +41,14 @@ public class AdminController(StoreContext context, UserManager<AppUser> userMana
     {
         return context.Makers.Include(mk => mk.ArtStoreInventories).FirstOrDefault(m => m.MakerId == id);
     }
+
+    [HttpGet]
+    [Route("admin/makerlistDTO")]
+    public List<MakerListDTO>? AllMakersDTO()
+    {
+        return context.Makers.Select(m => m.MakerListToDTO()).ToList();
+    }
+
     [HttpGet]
     [Route("admin/tags")]
     public List<Tag>? AllTags()

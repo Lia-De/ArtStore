@@ -46,4 +46,13 @@ public static class InventoryExtensions
         };
     }
 
+    public static MakerListDTO MakerListToDTO(this Maker maker)
+    {
+        return new MakerListDTO
+        {
+            MakerId = maker.MakerId,
+            Name = maker.MakerName()
+        };
+    }
+
 }

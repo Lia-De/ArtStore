@@ -73,24 +73,38 @@ public class ShoppingController(StoreContext context, UserManager<AppUser> userM
     }
     [HttpPost]
     [Route("shopping/addToBasket")]
-    public IActionResult AddToBasket([FromBody] BasketAddDTO addToBasket)
+    public IActionResult AddToBasket([FromBody] BasketAddDTO addInventoryToBasket)
     {
-        if (addToBasket == null)
+        ShoppingBasket? shoppingBasket;
+        if (addInventoryToBasket == null)
         {
             return BadRequest("Invalid basket data.");
         }
-        if (addToBasket.ShoppingBasketId == null || addToBasket.ShoppingBasketId <=0)
+        if (addInventoryToBasket.InventoryId == 0)
         {
-            var newBasket = new ShoppingBasket
-            {
-                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
-            };
-        
-            context.ShoppingBaskets.Add(newBasket);
-
+            return BadRequest("Inventory ID is required.");
+        }
+        ArtStoreInventory? inventory = context.ArtStoreInventories.FirstOrDefault(i => i.InventoryId == addInventoryToBasket.InventoryId);
+        if (inventory == null)
+        {
+            return NotFound("Inventory not found.");
         }
         
+        if (addInventoryToBasket.ShoppingBasketId == 0)
+        {
+            shoppingBasket = new ShoppingBasket() { CustomerId = addInventoryToBasket.CustomerId };
+            context.ShoppingBaskets.Add(shoppingBasket);
+        } else
+        {
+            shoppingBasket = context.ShoppingBaskets.FirstOrDefault(b => b.ShoppingBasketId == addInventoryToBasket.ShoppingBasketId);
+            if ( shoppingBasket == null)
+            {
+                return BadRequest("Invalid basket ID.");
+            }
+            
+        }
+
+        shoppingBasket.AddToBasket(inventory, addInventoryToBasket.Quantity);
         context.SaveChanges();
         
         return Ok();
