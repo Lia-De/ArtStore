@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import { useForm } from 'react-hook-form';
+import { set, useForm } from 'react-hook-form';
 
-export const UpdateInventory = ( {item, setItem, setUpdating} ) => {
+export const UpdateInventory = ( {item, setItem, setUiState} ) => {
     const {register, handleSubmit} = useForm();
        
     const onSubmit = (data) => {
-        setUpdating(false);
+        setUiState(prev => ({...prev, updating: false}));
         console.log(data);
         // Call the API to update the item..
         setItem(prev => ({...prev, 

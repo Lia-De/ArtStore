@@ -6,23 +6,24 @@ import { UpdateInventory } from './UpdateInventory.jsx';
 import { apiUrl } from '../config.js';
 
 export default function ListInventory(){
-    
+    const [uiState, setUiState] = useState({
+        loading: true,
+        error: null,
+        updating: false,
+    });
     const [inventory, setInventory] = useState([]);
     const [singleInventory, setSingleInventory] = useState({});
-    const [loading, setLoading] = useState(true);
-    const [updating, setUpdating] = useState(false);
-    const [error, setError] = useState(null);
     const { register, handleSubmit, reset } = useForm();
 
     useEffect( () => {
-        setLoading(true);
+        setUiState(prev => ({...prev, loading: true}));
         setError(null);
                 axios.get(`${apiUrl}/admin/inventory`)
                 .then((response) => {
                     setInventory(response.data);
                     console.log(response.data);
-                }) .catch ((err) => { setError(err); })
-                .finally(() => {  setLoading(false); });
+                }) .catch ((err) => { setUiState(prev => ({...prev, error: err})); })
+                .finally(() => {  setUiState(prev => ({...prev, loading: false})); });
     }, []);
     
 
@@ -43,8 +44,12 @@ export default function ListInventory(){
 
             }
             // console.log(newInventory);
-            setLoading(true);
-            setError(null);
+            setUiState(prev => ({
+                ...prev, 
+                loading: true,
+                error: null
+            }));
+
             axios.post(`${apiUrl}/admin/addInventory`, newInventory, {
                 headers: {
                   'Content-Type': 'application/json',
@@ -55,7 +60,7 @@ export default function ListInventory(){
             })
             .catch ((err) => {
                 console.error(err.response?.data || err.message);
-                setError(err)
+                setUiState(prev => ({...prev, error: err}));
             })
             .finally(() => { setLoading(false); });
         }
@@ -92,8 +97,9 @@ export default function ListInventory(){
     // useEffect(() => {singleInventory != {} && console.log(singleInventory);}, [singleInventory]);
 
     const updateItem = (item) => {
-        setUpdating(true);
-        setLoading(true);
+        
+        setUiState(prev => ({...prev, loading: true, updating: true}));
+
         setSingleInventory({});
         console.log(item);
         axios.get(`${apiUrl}/admin/inventory/${item}`)
@@ -104,7 +110,7 @@ export default function ListInventory(){
             console.error(err);
         })
         .finally(() => {
-            setLoading(false);
+            setUiState(prev => ({...prev, loading: false}));
         });
 
     }
@@ -130,19 +136,19 @@ export default function ListInventory(){
         <div>
             <h1>Art Store</h1>
             
-            {inventory && !updating && <h2>Inventory</h2>}
-            {loading && <p>Loading...</p>}
-            {error && <p>Error: {error.message}</p>}
-            {inventory && !updating && <>
+            {uiState.inventory && !uiState.updating && <h2>Inventory</h2>}
+            {uiState.loading && <p>Loading...</p>}
+            {uiState.error && <p>Error: {error.message}</p>}
+            {uiState.inventory && !uiState.updating && <>
                 <div className='inventory-list'>
                     {inventoryElements}
                 </div>
                 <AddNewInventory />
                 </>
             }
-            {updating && !loading && <>
+            {uiState.updating && !uiState.loading && <>
             <h2>Updating</h2>
-            { singleInventory && <UpdateInventory item={singleInventory} setItem={setSingleInventory} setUpdating={setUpdating} />}
+            { singleInventory && <UpdateInventory item={singleInventory} setItem={setSingleInventory} setUiState={setUiState} />}
             
             </>}
         </div>
