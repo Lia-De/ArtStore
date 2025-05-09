@@ -6,6 +6,7 @@ import ListInventory from './components/ListInventory.jsx'
 import Shopfront from './components/Shopfront.jsx'
 import Navbar from './components/Navbar.jsx'
 import Cart from './components/Cart.jsx'
+import Checkout from './components/Checkout.jsx'
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
         <Route path="/admin" element={<ListInventory />} />
         <Route path="/" element={<Shopfront />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
       </Route>
       </Routes>
     </BrowserRouter>

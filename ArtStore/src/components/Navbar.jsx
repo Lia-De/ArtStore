@@ -19,8 +19,8 @@ export const Navbar = () => {
                 </li>
                 {shopCustomer && <li>
                     <NavLink to="/mypage" className="navbar-item">My page</NavLink></li>}
-                {shoppingCart && <li>
-                    <NavLink to="/cart" className="navbar-item">Cart</NavLink></li>}
+                <li>
+                    <NavLink to="/cart" className="navbar-item">Cart</NavLink></li>
                 <li>
                     <NavLink to="/login" className="navbar-item">Login</NavLink>
                 </li>
