@@ -7,6 +7,7 @@ import { apiUrl } from '../config.js';
 import { useAtom } from 'jotai';
 import { inventoryListAtom, makerListAtom } from '../atoms/inventoryListAtom.js';
 
+
 export default function ListInventory(){
     const [uiState, setUiState] = useState({
         loading: true,
@@ -44,8 +45,31 @@ export default function ListInventory(){
     
 
     function AddNewInventory(){
-        const onSubmit = (data) => {
-            reset();
+        const [selectedFile, setSelectedFile] = useState(null);
+
+        
+        const onSubmit = async (data) => {
+            // console.log(data.imageUpload[0])
+            var imageresult = null;
+            
+            const formData = new FormData();
+            formData.append("imageUpload", data.imageUpload[0]); 
+            // console.log(formData);
+            try {
+                imageresult = await axios.post(
+                    `${apiUrl}/admin/uploadImage`, // adjust as needed
+                    formData
+                );
+                
+            } catch (error) {
+                console.error("Upload failed:", error);
+                alert("Upload failed: " + (error.response?.data || error.message));
+            }
+            
+            console.log(imageresult.data);
+            const imageUrl = imageresult ? `${apiUrl}/images/${imageresult.data}` : data.imageUrl;
+            console.log(imageUrl);
+
             const newInventory = {
                 Name: data.name,
                 maker: {
@@ -56,7 +80,7 @@ export default function ListInventory(){
                 description: data.description,
                 quantity: parseFloat(data.quantity),
                 price: parseInt(data.price, 10),
-                imageUrl: data.imageUrl,
+                imageUrl: imageUrl,
                 tags: data.tags.split(",").map(tag => tag.trim()),
 
             }
@@ -72,7 +96,7 @@ export default function ListInventory(){
                   'Content-Type': 'application/json',
                 }
               })
-            .then((response) => {
+            .then(() => {
                 // setInventory(prev => [...prev, response.data]);
                 setUiState(prev => ({...prev, reload: true}));
             })
@@ -80,7 +104,10 @@ export default function ListInventory(){
                 console.error(err.response?.data || err.message);
                 setUiState(prev => ({...prev, error: err}));
             })
-            .finally(() => { setUiState(prev => ({...prev, loading: false}));});
+            .finally(() => { 
+                setUiState(prev => ({...prev, loading: false}));
+                reset();
+            });
         }
         function MakerListElements() {
             return (
@@ -102,19 +129,25 @@ export default function ListInventory(){
                 <input type="text" id="newmaker" placeholder="Firstname" {...register("makerFirst")}/>
                 <input type="text" id="newmaker2" placeholder="Lastname" {...register("makerLast")}/>
                 <label htmlFor="name">Item name:</label>
-                <input type="text" id="name" {...register("name")}/>
+                <input type="text" id="name" {...register("name" , { required: true})}/>
 
                 <label htmlFor="description">Description:</label>
                 <input type="text" id="description" {...register("description")} />
 
                 <label htmlFor="quantity">Quantity:</label>
-                <input type="number" id="quantity" {...register("quantity")} />
+                <input type="number" id="quantity" {...register("quantity", { required: true})} />
 
                 <label htmlFor="price">Price:</label>
-                <input type="number" step="0.01" id="price" {...register("price")} />
+                <input type="number" step="0.01" id="price" {...register("price", { required: true})} />
 
                 <label htmlFor="imageUrl">Image URL:</label>
                 <input type="text" id="imageUrl" {...register("imageUrl")} />
+                
+                <label htmlFor="imageUpload">Upload image:</label>
+                <input type="file" id="imageUpload" accept="image/*"   
+                    {...register("imageUpload", {
+                        onChange: (e) => {  return e.target.files; }
+                    })} />
 
                 <label htmlFor="tags">Tags:</label>
                 <input type="text" id="tags" {...register("tags")} />
@@ -127,6 +160,7 @@ export default function ListInventory(){
     // Check to see if we have an updated item.
     // useEffect(() => {singleInventory != {} && console.log(singleInventory);}, [singleInventory]);
     
+
 
     const updateItem = (item) => {
         

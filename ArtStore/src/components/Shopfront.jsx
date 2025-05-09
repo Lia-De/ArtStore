@@ -111,7 +111,7 @@ if ( uiState.viewList){
                         {item.imageUrl && <img src={item.imageUrl} alt={item.name} />}
                         <p>{item.description}</p>
                         <p>Price: ${item.price}</p>
-                        <p>Quantity: {item.quantity}</p>
+                        <p className={item.quantity==0 ? "soldout": undefined}>Quantity: {item.quantity}</p>
                         <p>Maker: {item.maker?.firstname} {item.maker?.lastname}</p>
                     </div>
                 ))}

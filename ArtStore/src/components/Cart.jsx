@@ -3,6 +3,7 @@ import { useAtom } from 'jotai';
 import { shoppingCartAtom } from '../atoms/cartAtom.js';
 import { apiUrl } from '../config.js';
 import { shopCustomerAtom } from '../atoms/shopCustomerAtom';
+import { Link } from 'react-router';
 
 const Cart = () => {
     const [shoppingCart, setShoppingCart] = useAtom(shoppingCartAtom);
@@ -48,7 +49,7 @@ const Cart = () => {
                 </div>
             ))}
             {shoppingCart && <p>Total: ${shoppingCart.totalPrice} kr</p>}
-            <button className="btn btn-primary">Continue Shopping</button>
+            <Link to="/"><button>Continue Shopping</button></Link>
         </div>
     );
 }
