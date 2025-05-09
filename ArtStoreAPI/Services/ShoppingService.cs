@@ -40,23 +40,6 @@ public class ShoppingService(StoreContext context)
         return order.TotalCost;
     }
 
-    public List<InventoryDTO>? CartItems(ShoppingBasket basket)
-    {
-        
-        // Extract all inventory IDs from the basket items
-        var inventoryIds = basket.BasketItems.Select(item => item.InventoryId).ToList();
-        Console.WriteLine(inventoryIds.Count);
-
-        // Query the ArtStoreInventory items with these IDs
-        var inventoryItems = context.ArtStoreInventories
-            .Where(item => inventoryIds.Contains(item.InventoryId))
-            .Include(t => t.Tags)
-            .Include(m => m.Maker)
-            .Select(item => item.ToDTO())
-            .ToList();
-
-        return inventoryItems;
-    }
     public void CancelBasket(ShoppingBasket basket)
     {
         if (basket.BasketItems != null && basket.BasketItems.Count > 0)

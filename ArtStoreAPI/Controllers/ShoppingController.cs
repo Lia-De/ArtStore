@@ -71,19 +71,7 @@ public class ShoppingController(StoreContext context, UserManager<AppUser> userM
         }
         return Ok(inventory.ToDTO());
     }
-    [HttpGet]
-    [Route("shopping/cart/{shoppingBasketId}")]
-    public IActionResult GetShoppingBasket(int shoppingBasketId)
-    {
-        var basket = context.ShoppingBaskets.Include(bi => bi.BasketItems).FirstOrDefault(b => b.ShoppingBasketId == shoppingBasketId);
-        if (basket == null)
-        {
-            return NotFound("Shopping basket not found.");
-        }
-        var cartList = shoppingService.CartItems(basket);
 
-        return Ok(cartList);
-    }
 
     [HttpPost]
     [Route("shopping/addToBasket")]
@@ -107,6 +95,7 @@ public class ShoppingController(StoreContext context, UserManager<AppUser> userM
         if (addInventoryToBasket.ShoppingBasketId == 0)
         {
             shoppingBasket = new ShoppingBasket() { CustomerId = addInventoryToBasket.CustomerId };
+
             context.ShoppingBaskets.Add(shoppingBasket);
         } else
         {
@@ -119,6 +108,7 @@ public class ShoppingController(StoreContext context, UserManager<AppUser> userM
         }
 
         shoppingBasket.AddToBasket(inventory, addInventoryToBasket.Quantity);
+
         context.SaveChanges();
         
         return Ok(shoppingBasket);
@@ -129,6 +119,7 @@ public class ShoppingController(StoreContext context, UserManager<AppUser> userM
     {
         var shoppingBasket = context.ShoppingBaskets
             .Include(b => b.BasketItems)
+            .ThenInclude(bi => bi.Inventory)
             .FirstOrDefault(b => b.ShoppingBasketId == shoppingBasketId);
         if (shoppingBasket != null)
             shoppingService.CancelBasket(shoppingBasket);

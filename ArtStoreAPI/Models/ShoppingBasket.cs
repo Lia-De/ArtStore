@@ -38,9 +38,12 @@ public class ShoppingBasket
         else
         {
 
-            var newBasketItem = new BasketItem(ShoppingBasketId, inventory.InventoryId, inventory.Price);
-            inventory.Quantity--;
-            inventory.CurrentlyInBaskets++;
+            var newBasketItem = new BasketItem(ShoppingBasketId, inventory.InventoryId, inventory.Price)
+            { 
+                Inventory = inventory,
+            };
+            inventory.Quantity-=itemsToAdd;
+            inventory.CurrentlyInBaskets+=itemsToAdd;
             BasketItems.Add(newBasketItem);
         }
         TotalPrice += (inventory.Price * itemsToAdd);
