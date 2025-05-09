@@ -62,6 +62,15 @@ public class AdminController(StoreContext context, UserManager<AppUser> userMana
         return context.Tags.Include(t => t.ArtStoreInventories).FirstOrDefault(t => t.TagId == id);
     }
 
+    [HttpGet]
+    [Route("admin/allActiveBaskets")]
+    public List<ShoppingBasket>? AllActiveBaskets()
+    {
+        return context.ShoppingBaskets
+            .Include(bi=> bi.BasketItems)
+            .Where(b => b.Status == Status.Active)
+            .ToList();
+    }
 
 
     [HttpPost]

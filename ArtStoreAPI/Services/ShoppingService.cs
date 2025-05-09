@@ -57,7 +57,7 @@ public class ShoppingService(StoreContext context)
             }
 
         }
-        Console.WriteLine(basket.BasketItems.Count);
+        
         context.ShoppingBaskets.Remove(basket);
         context.SaveChanges();
     }

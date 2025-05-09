@@ -18,13 +18,8 @@ public class ShoppingBasket
         {
             throw new InvalidOperationException("Cannot add item to basket. Not enough stock available.");
         }
-
-        if (inventory.Quantity <= 0)
-        {
-            throw new InvalidOperationException("Cannot add item to basket. ");
-        }
-        var basketItem = BasketItems.FirstOrDefault(b => b.InventoryId == inventory.InventoryId);
         
+        var basketItem = this.BasketItems.FirstOrDefault(b => b.InventoryId == inventory.InventoryId);
         // The item is already in the basked, update the quantity
         if (basketItem != null)
         {
@@ -37,13 +32,13 @@ public class ShoppingBasket
         // Item is not already in the basket, create a new item and update.
         else
         {
-
             var newBasketItem = new BasketItem(ShoppingBasketId, inventory.InventoryId, inventory.Price)
             { 
                 Inventory = inventory,
             };
             inventory.Quantity-=itemsToAdd;
             inventory.CurrentlyInBaskets+=itemsToAdd;
+            newBasketItem.Quantity = itemsToAdd;
             BasketItems.Add(newBasketItem);
         }
         TotalPrice += (inventory.Price * itemsToAdd);

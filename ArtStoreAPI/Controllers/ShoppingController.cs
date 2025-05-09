@@ -71,7 +71,20 @@ public class ShoppingController(StoreContext context, UserManager<AppUser> userM
         }
         return Ok(inventory.ToDTO());
     }
-
+    [HttpGet]
+    [Route("shopping/getBasket/{basketId}")]
+    public IActionResult GetBasket(int basketId)
+    {
+        var shoppingBasket = context.ShoppingBaskets
+            .Include(b => b.BasketItems)
+            .ThenInclude(bi => bi.Inventory)
+            .FirstOrDefault(b => b.ShoppingBasketId == basketId);
+        if (shoppingBasket == null)
+        {
+            return NotFound("Shopping basket not found.");
+        }
+        return Ok(shoppingBasket);
+    }
 
     [HttpPost]
     [Route("shopping/addToBasket")]
@@ -99,7 +112,7 @@ public class ShoppingController(StoreContext context, UserManager<AppUser> userM
             context.ShoppingBaskets.Add(shoppingBasket);
         } else
         {
-            shoppingBasket = context.ShoppingBaskets.FirstOrDefault(b => b.ShoppingBasketId == addInventoryToBasket.ShoppingBasketId);
+            shoppingBasket = context.ShoppingBaskets.Include(b=> b.BasketItems).ThenInclude(i=> i.Inventory).FirstOrDefault(b => b.ShoppingBasketId == addInventoryToBasket.ShoppingBasketId);
             if ( shoppingBasket == null)
             {
                 return BadRequest("Invalid basket ID.");
