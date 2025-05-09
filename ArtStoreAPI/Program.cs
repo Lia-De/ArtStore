@@ -50,10 +50,13 @@ app.MapIdentityApi<AppUser>();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
+    app.UseSwagger();
     app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();

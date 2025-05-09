@@ -133,6 +133,26 @@ public class AdminController(StoreContext context, UserManager<AppUser> userMana
     }
 
     [HttpPost]
+    [Route("admin/uploadImage")]
+    public async Task<IActionResult> UploadImage(IFormFile imageUpload)
+    {
+        var date = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        var fileName = $"{date}_{imageUpload.FileName}";
+        var filePath = Path.Combine("wwwroot", "images", fileName);
+        
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await imageUpload.CopyToAsync(stream);
+        }
+
+        //if (imageUpload == null || imageUpload.FileName == null)
+        //{
+        //return BadRequest("Invalid image data.");
+        //}
+        return Ok(fileName);
+    }
+
+    [HttpPost]
     [Route("admin/inventoryRemoveTag")]
     public IActionResult InventoryRemoveTag(int inventoryId, int tagId)
     {
