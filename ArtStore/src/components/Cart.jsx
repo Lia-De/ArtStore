@@ -17,13 +17,16 @@ const Cart = () => {
         deleting: false
     });
 
+
     useEffect(() => { 
+     
         // fetch the basket from the server to make it complete
         setUiState(prev => ({...prev, loading: true, error: null}));
-        axios.get(`${apiUrl}/shopping/getBasket/${shoppingCart?.shoppingBasketId}`)
+        shoppingCart?.shoppingBasketId && axios.get(`${apiUrl}/shopping/getBasket/${shoppingCart?.shoppingBasketId}`)
         .then ((response) => {
             setShoppingCart(response.data);
             setCartItems(response.data.basketItems ?? []);
+            
             
         })
         .catch((err) => {
@@ -35,6 +38,15 @@ const Cart = () => {
         });
     }
     , []);
+    useEffect(() => {
+           if (shopCustomer?.shopCustomerId) {
+            if (shoppingCart?.customerId !== shopCustomer?.shopCustomerId) {
+                setShoppingCart({ ...shoppingCart, customerId: shopCustomer?.shopCustomerId });
+            }
+        }
+        console.log(shoppingCart);
+        console.log(shopCustomer);
+    }, [shoppingCart]);
 
     useEffect(() => {
         uiState.deleting && (
@@ -50,6 +62,7 @@ const Cart = () => {
     }, [uiState.deleting]);
     
     return (
+    <>
         <div className="cart">
             <h1>Shopping Cart</h1>
             {!shoppingCart && <p>Your cart is empty.</p>}
@@ -63,12 +76,13 @@ const Cart = () => {
                     </div>
                 </div>
             ))}
-            {shoppingCart && <p>Total: ${shoppingCart.totalPrice} kr</p>}
+        </div>
+            {shoppingCart && <p>Total: ${shoppingCart?.totalPrice} kr</p>}
             
-            {shoppingCart.totalPrice >1 && <button onClick={() => setUiState(prev => ({...prev, deleting: true}))}>Empty Cart</button>}
+            {shoppingCart?.totalPrice >1 && <button onClick={() => setUiState(prev => ({...prev, deleting: true}))}>Empty Cart</button>}
             <Link to="/"><button>Continue Shopping</button></Link>
             {shoppingCart && <Link to="/checkout"><button>Checkout</button></Link>}
-        </div>
+    </>
     );
 }
 export default Cart;

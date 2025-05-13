@@ -32,7 +32,7 @@ public class ArtStoreInventory
     }
     public bool IsInStock(int quantity)
     {
-        return Quantity - CurrentlyInBaskets >= quantity;
+        return Quantity - CurrentlyInBaskets >= 0;
     }
     public bool AvailableToPurchase(int quantity)
     {

@@ -139,5 +139,39 @@ public class ShoppingController(StoreContext context, UserManager<AppUser> userM
         
         return Ok();
     }
+    [HttpPost]
+    [Route("shopping/checkoutBasket/")]
+    public IActionResult CheckoutBasket([FromBody] CheckoutDTO checkout)
+    {
+        if (checkout == null)
+        {
+            return BadRequest("Invalid checkout data.");
+        }
+        if (checkout.ShoppingBasketId == 0)
+        {
+            return BadRequest("Shopping basket ID is required.");
+        }
+        if (checkout.CustomerId == 0)
+        {
+            return BadRequest("Customer ID is required.");
+        }
+        if (checkout.ShippingCost < 0)
+        {
+            return BadRequest("Shipping cost cannot be negative.");
+        }
+
+        var shoppingBasket = context.ShoppingBaskets
+            .Include(b => b.BasketItems)
+            .ThenInclude(bi => bi.Inventory)
+            .FirstOrDefault(b => b.ShoppingBasketId == checkout.ShoppingBasketId);
+
+        if (shoppingBasket == null)
+        {
+            return NotFound("Shopping basket not found.");
+        }
+        var totalCost = shoppingService.CheckoutBasket(shoppingBasket, checkout.CustomerId, checkout.ShippingCost);
+
+        return Ok(totalCost);
+    }
 
 }

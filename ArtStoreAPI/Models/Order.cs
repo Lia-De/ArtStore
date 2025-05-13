@@ -20,6 +20,8 @@ public class Order
     }
     public Order(ShoppingBasket basket, decimal shippingCost)
     {
+        ShoppingBasketId = basket.ShoppingBasketId;
+        ShopCustomerId = basket.CustomerId;
         ShippingCost = shippingCost;
         TotalCost = basket.TotalPrice + shippingCost;
     }
