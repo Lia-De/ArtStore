@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using ArtStoreAPI.ModelsDTO;
 namespace ArtStoreAPI.Models;
 
 public class ShopCustomer
@@ -9,6 +10,7 @@ public class ShopCustomer
     public string Firstname { get; set; } = string.Empty;
     public string Lastname { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;
     public string City { get; set; } = string.Empty;
@@ -20,5 +22,25 @@ public class ShopCustomer
     public List<Order> Orders { get; set; } = [];
     public string PaymentDetail { get; set; } = string.Empty; // Set dummy values from frontend
 
-
+    // add a DTO Conversion
+    public ShopCustomerDTO ToDTO()
+    {
+        return new ShopCustomerDTO
+        {
+            ShopCustomerId = this.ShopCustomerId,
+            Firstname = this.Firstname,
+            Lastname = this.Lastname,
+            Email = this.Email,
+            Phone = this.Phone,
+            Address = this.Address,
+            City = this.City,
+            ZipCode = this.ZipCode,
+            Country = this.Country,
+            CreatedAt = this.CreatedAt,
+            UpdatedAt = this.UpdatedAt,
+            ShoppingBaskets = this.ShoppingBaskets,
+            Orders = this.Orders,
+            PaymentDetail = this.PaymentDetail
+        };
+    }
 }

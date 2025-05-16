@@ -24,6 +24,10 @@ public class ShoppingController(StoreContext context, UserManager<AppUser> userM
         {
             return BadRequest("Email is required.");
         }
+        if (string.IsNullOrEmpty(customer.Password))
+        {
+            return BadRequest("Password is required.");
+        }
         var newCustomer = customer as ShopCustomer;
         newCustomer.CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         newCustomer.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -35,14 +39,14 @@ public class ShoppingController(StoreContext context, UserManager<AppUser> userM
 
     [HttpGet]
     [Route("shopping/getUserProfile/{userId}")]
-    public IActionResult GetUserProfile(string userId)
+    public IActionResult GetUserProfile(int userId)
     {
-        var customer = context.ShopCustomers.FirstOrDefault(c => c.UserId == userId);
+        var customer = context.ShopCustomers.FirstOrDefault(c => c.ShopCustomerId == userId);
         if (customer == null)
         {
             return NotFound("Customer not found.");
         }
-        return Ok(customer);
+        return Ok(customer.ToDTO());
     }
     [HttpGet]
     [Route("shopping/listInventories")]
@@ -140,8 +144,8 @@ public class ShoppingController(StoreContext context, UserManager<AppUser> userM
         return Ok();
     }
     [HttpPost]
-    [Route("shopping/checkoutBasket/")]
-    public IActionResult CheckoutBasket([FromBody] CheckoutDTO checkout)
+    [Route("shopping/checkout/")]
+    public IActionResult Checkout([FromBody] CheckoutDTO checkout )
     {
         if (checkout == null)
         {
@@ -155,10 +159,6 @@ public class ShoppingController(StoreContext context, UserManager<AppUser> userM
         {
             return BadRequest("Customer ID is required.");
         }
-        if (checkout.ShippingCost < 0)
-        {
-            return BadRequest("Shipping cost cannot be negative.");
-        }
 
         var shoppingBasket = context.ShoppingBaskets
             .Include(b => b.BasketItems)
@@ -169,7 +169,13 @@ public class ShoppingController(StoreContext context, UserManager<AppUser> userM
         {
             return NotFound("Shopping basket not found.");
         }
-        var totalCost = shoppingService.CheckoutBasket(shoppingBasket, checkout.CustomerId, checkout.ShippingCost);
+        if (shoppingBasket.Status == Status.Purchased)
+        {
+            return BadRequest("Shopping basket has already been purchased.");
+        }
+        var customer = context.ShopCustomers.FirstOrDefault(c => c.ShopCustomerId == checkout.CustomerId);
+        decimal shippingCost = checkout.ShippingMethod == "express" ? 150 : 50;
+        var totalCost = shoppingService.CheckoutBasket(shoppingBasket, checkout.CustomerId, shippingCost);
 
         return Ok(totalCost);
     }
