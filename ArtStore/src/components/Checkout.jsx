@@ -5,6 +5,7 @@ import { apiUrl } from '../config.js';
 import { shopCustomerAtom } from '../atoms/shopCustomerAtom';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
+import { useNavigate } from 'react-router';
 
 
 const Checkout = () => {
@@ -12,25 +13,42 @@ const Checkout = () => {
     const [shoppingCart, setShoppingCart] = useAtom(shoppingCartAtom);
     const [shopCustomer, setShopCustomer] = useAtom(shopCustomerAtom);
     const [purchaseCheck, setPurchaseCheck] = useState(false);
+    const [paymentDetail, setPaymentDetail] = useState(null);
+    const [shippingMethod, setShippingMethod] = useState(null);
+    const [totalCost, setTotalCost] = useState(0);
     const [uiState, setUiState] = useState({
         loading: true,
         error: null,
         updating: false,
         deleting: false
     });
-
+    const navigate = useNavigate();
     useEffect(() => {
-        shopCustomer?.shopCustomerId && setPurchaseCheck(true);
-        
-        console.log(shopCustomer);
-    }, [shopCustomer]);
+        setTotalCost(shoppingCart.totalPrice);
+        return () => {
+            setTotalCost(0);
+            setPaymentDetail(null);
+            setShippingMethod(null);
+            setPurchaseCheck(false);
+        }
+    }, []);
+    useEffect(() => {
+        console.log('cart', shoppingCart);
+        shopCustomer?.shopCustomerId && paymentDetail && shippingMethod && setPurchaseCheck(true);
+        if (shippingMethod) {
+            if (shippingMethod === "standard") {
+                setTotalCost(shoppingCart.totalPrice + 50);
+            } else if (shippingMethod === "express") {
+                setTotalCost(shoppingCart.totalPrice + 150);
+            }
+        }
+    }, [shopCustomer, paymentDetail, shippingMethod]);
 
     const onSubmit = (data) => {
         axios.post(`${apiUrl}/shopping/CreateUserProfile`, data)
         .then((result)=>{
-            console.log(result.data);
+            // console.log(result.data);
             setShopCustomer(result.data);
-            setPurchaseCheck(true);
         })
         .catch((err) => {
             setUiState(prev => ({...prev, error: err}));
@@ -41,21 +59,34 @@ const Checkout = () => {
     }
 
     const confirmOrder = () => {
-        console.log(shopCustomer) ; console.log(shoppingCart)
+        // console.log(shopCustomer);
+        // console.log(shoppingCart);
         setUiState(prev => ({...prev, updating: true}));
 
-        
-        axios.post(`${apiUrl}/shopping/confirmOrder`, order)
+        const order = {
+            customerId: shopCustomer.shopCustomerId,
+            shoppingBasketId: shoppingCart.shoppingBasketId,
+            paymentDetail: paymentDetail,
+            shoppingMethod: shippingMethod,
+
+        }
+        console.log(order);
+        axios.post(`${apiUrl}/shopping/checkout`, order)
         .then((result)=>{
-            console.log(result.data);
+            // console.log(result.data);
+            alert("Order confirmed ", result.data);
+            setShoppingCart([]);
+            navigate('/cart');
         })
         .catch((err) => {
             setUiState(prev => ({...prev, error: err}));
+            console.log(err.response.data);
         })
         .finally(() => {
             setUiState(prev => ({...prev, updating: false}));
         });
     }
+
 
     return (
         <div className="checkout">
@@ -64,7 +95,7 @@ const Checkout = () => {
                 <div className="checkout_container_cart">
                     <table>
                         <tbody>
-                        {shoppingCart.basketItems.map((item) => (
+                        {shoppingCart?.basketItems?.map((item) => (
                             <tr key={item.inventoryId} className="checkout_container_cart_item">
                                     <td><img src={item.inventory?.imageUrl} alt={item.inventory.name} /></td>
                                     <td>{item.inventory.name} </td>
@@ -73,26 +104,30 @@ const Checkout = () => {
                             </tr>
                         ))}
                         <tr>
-                            <td colSpan="3"  className="text-right">Total:</td>
-                            <td>${shoppingCart.totalPrice}</td>
+                            <td colSpan="3"  className="text-right">Total: {shippingMethod === "standard" ? '+ 50 kr': shippingMethod === "express" ? '+ 150 kr' : ''}</td>
+                            <td>{totalCost} kr</td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
 
-{!shopCustomer?.shopCustomerId &&
+            {!shopCustomer?.shopCustomerId &&
                 <div className="checkout_container_customer">
                     <h2>Customer Information</h2>
                     <form onSubmit={handleSubmit(onSubmit)}>
-                        <label htmlFor="firstname">Firstname:</label>
+                        <label htmlFor="firstname">* Firstname: </label>
                         <input type="text" id="firstname" defaultValue={shopCustomer.firstname}
                           {...register('firstname', {required: true})} />
-                        <label htmlFor="lastname">Lastname:</label>
+                        <label htmlFor="lastname">* Lastname:</label>
                         <input type="text" id="lastname" defaultValue={shopCustomer.lastname}
                           {...register('lastname', {required: true})} />
-                        <label htmlFor="email">Email:</label>
+                        <label htmlFor="email">* Email:</label>
                         <input type="email" id="email" defaultValue={shopCustomer.email}
                           {...register('email', {required: true})} />
+                        {errors.email && <span className="error">Email is required</span>}
+                        <label htmlFor="password">* Password:</label>
+                        <input type="password" id="password" defaultValue={shopCustomer.password}
+                          {...register('password', {required: true})} />
                         <label htmlFor="phone">Phone:</label>
                         <input type="text" id="phone" defaultValue={shopCustomer.phone}
                           {...register('phone')} />
@@ -108,21 +143,37 @@ const Checkout = () => {
                         <label htmlFor="country">Country:</label>
                         <input type="text" id="country" defaultValue={shopCustomer.country}
                           {...register('country')} />
-                        <label htmlFor="shippingMethod">Shipping Method:</label>
-                        <select id="shippingMethod" defaultValue={shopCustomer.shippingMethod}
-                          {...register('shippingMethod')}>
-                            <option value="standard">Standard</option>
-                            <option value="express">Express</option>
-                        </select>
+                        
                         <button type="submit"
                          disabled={shopCustomer.customerId ? true: undefined} 
                         className={shopCustomer.customerId ? 'disabled': undefined}
                         >Save User Profile</button>
                     </form>
                 </div>
-}
+        }
+        <div className="checkout_container_payment">
+            <h2>Shipping</h2>
+            <form>
+                <label htmlFor="standard">Standard, 50 sek</label>
+                <input type="radio" name="shippingMethod" id="standard" onChange={() => setShippingMethod("standard")} />
+                <label htmlFor="express">Express, 150 sek</label>
+                <input type="radio" name="shippingMethod" id="express"  onChange={() => setShippingMethod("express")} />
+            </form>
 
+            <h2>Payment Information</h2>
+            <form>
+                <label htmlFor="cc">Credit Card</label>
+                <input type="radio" name="paymentDetail" id="cc" onChange={() => setPaymentDetail("cc")} />
+                <label htmlFor="swish">Swish</label>
+                <input type="radio" name="paymentDetail" id="swish"  onChange={() => setPaymentDetail("swish")} />
+                <label htmlFor="invoice">Invoice</label>
+                <input type="radio" name="paymentDetail" id="invoice"  onChange={() => setPaymentDetail("invoice")} />
+                <label htmlFor="bank">Bank Transfer</label>
+                <input type="radio" name="paymentDetail" id="bank"  onChange={() => setPaymentDetail("bank")} />
+            </form>
+        </div>
                 <div className="checkout_container_confirm">
+                    
                     <button disabled={purchaseCheck ? undefined: true} 
                         className={purchaseCheck ? undefined: 'disabled'}
                         onClick={() => { confirmOrder()  } }>
@@ -132,7 +183,7 @@ const Checkout = () => {
             </div>
         </div>
     )
-
+    
 
 }
 export default Checkout;

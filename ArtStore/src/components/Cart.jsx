@@ -9,6 +9,7 @@ import axios from 'axios';
 const Cart = () => {
     const [shoppingCart, setShoppingCart] = useAtom(shoppingCartAtom);
     const [shopCustomer, setShopCustomer] = useAtom(shopCustomerAtom);
+
     const [cartItems, setCartItems] = useState([]);
     const [uiState, setUiState] = useState({
         loading: true,
@@ -19,6 +20,9 @@ const Cart = () => {
 
 
     useEffect(() => { 
+
+        // console.log('cart', shoppingCart);
+        // console.log('customer', shopCustomer);
      
         // fetch the basket from the server to make it complete
         setUiState(prev => ({...prev, loading: true, error: null}));
@@ -26,34 +30,47 @@ const Cart = () => {
         .then ((response) => {
             setShoppingCart(response.data);
             setCartItems(response.data.basketItems ?? []);
-            
-            
         })
         .catch((err) => {
             setUiState(prev => ({...prev, error: err}));
-            setCartItems([]);
+            if (err.response.status === 404) {
+                setShoppingCart([]);
+                setCartItems([]);
+            }   
         })
         .finally(() => {
             setUiState(prev => ({...prev, loading: false}));
         });
+        
+        // console.log('cartitems', cartItems);
+        // Also make sure the user is validated
+        
+        if (shopCustomer?.shopCustomerId) {
+            setUiState(prev => ({...prev, loading: true, error: null}));
+            axios.get(`${apiUrl}/shopping/getUserProfile/${shopCustomer?.shopCustomerId}`)
+            .then ((response) => {
+                setShopCustomer(response.data);
+            })
+            .catch((err) => {
+                setUiState(prev => ({...prev, error: err}));
+                if (err.response.status === 404) {
+                    setShopCustomer([]);
+                }   
+            })
+            .finally(() => {
+                setUiState(prev => ({...prev, loading: false}));
+            });
+        }
     }
     , []);
-    useEffect(() => {
-           if (shopCustomer?.shopCustomerId) {
-            if (shoppingCart?.customerId !== shopCustomer?.shopCustomerId) {
-                setShoppingCart({ ...shoppingCart, customerId: shopCustomer?.shopCustomerId });
-            }
-        }
-        console.log(shoppingCart);
-        console.log(shopCustomer);
-    }, [shoppingCart]);
-
+ 
     useEffect(() => {
         uiState.deleting && (
             axios.post(`${apiUrl}/shopping/cancelBasket/${shoppingCart.shoppingBasketId}`)
             .then(() => {
                 setUiState({ ...uiState, deleting: false });
                 setShoppingCart(null);
+                setCartItems([]);
             }).catch((err) => {
                 setUiState({ ...uiState, deleting: false, error: err });
                 alert("Error deleting cart", err.error);
@@ -77,11 +94,12 @@ const Cart = () => {
                 </div>
             ))}
         </div>
-            {shoppingCart && <p>Total: ${shoppingCart?.totalPrice} kr</p>}
+            {shoppingCart?.totalPrice > 0 && <p>Total: {shoppingCart?.totalPrice} kr</p>}
             
             {shoppingCart?.totalPrice >1 && <button onClick={() => setUiState(prev => ({...prev, deleting: true}))}>Empty Cart</button>}
             <Link to="/"><button>Continue Shopping</button></Link>
-            {shoppingCart && <Link to="/checkout"><button>Checkout</button></Link>}
+            {shoppingCart?.totalPrice >1 &&  <Link to="/checkout">
+                <button >Checkout</button></Link>}
     </>
     );
 }

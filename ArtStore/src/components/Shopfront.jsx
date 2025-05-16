@@ -24,8 +24,9 @@ const Shopfront = () => {
     });
 
     useEffect(() => {
-        console.log(shoppingCart);
-        console.log(shopCustomer);
+        // console.log('cart', shoppingCart);
+        // console.log('customer', shopCustomer);
+        
         setUiState(prev => ({...prev, loading: true, error: null}));
         fetch(`${apiUrl}/shopping/listInventories`)
             .then((response) => response.json())
