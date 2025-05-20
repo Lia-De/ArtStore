@@ -18,7 +18,6 @@ useEffect(() => {
     axios.get(`${apiUrl}/admin/orders/active`)
         .then(response => {
             setOrders(response.data)
-            console.log(response.data);
         })
         .catch(err => {
             setUiState(prev => ({...prev, error: err}));
@@ -32,15 +31,18 @@ useEffect(() => {
     const changeDetail = (orderId) => {
         if (displayDetail === orderId) {
             setDisplayDetail(0);
+            setOrderDetails([]);
         } else {
             setDisplayDetail(orderId);
+            setOrderDetails(orders.filter(order => order.orderId === orderId));
+            console.log(orders.filter(order => order.orderId === orderId));
         }
     }
 
     const DisplayDetail = (order) => {
         if (displayDetail === order.orderId) {
             return (
-                <tr>
+                <tr className="highlight" key={`detail-${order.orderId}`}>
                 <td colSpan="3">
                  <div>
                      {order.shoppingBasket.basketItems.map(item => (
@@ -48,6 +50,15 @@ useEffect(() => {
                             <p>{item.inventory.name} x {item.quantity} @ {item.price} kr</p>
                             <p>Order created: {Format.formatDate(order.createdAt)}</p>
                             <p>Order updated: {Format.formatDate(order.updatedAt)}</p>
+                            <p>Payment Method: {order.paymentDetail}</p>
+                             <button     
+                                    disabled={displayDetail === order.orderId ? undefined: true} 
+                                    className={displayDetail === order.orderId ? undefined: 'disabled'}
+                                    >Ship</button> 
+                                    <button 
+                                    disabled={displayDetail === order.orderId ? undefined: true} 
+                                    className={displayDetail === order.orderId ? undefined: 'disabled'}
+                                    >Cancel & Refund</button>
                          </div>
                      ))}
              </div>
@@ -77,20 +88,21 @@ useEffect(() => {
             {uiState.loading && <p>Loading...</p>}
             {uiState.error && <p>Error: {uiState.error.message}</p>}
             {orders.length > 0 ? (
-                <table>
+                <table id="orders-table">
                     <thead>
                         <tr>
                             <th>Order ID</th>
                             <th>Items</th>
                             <th>Total Price</th>
                             <th>Created</th>
-                            <th>Action</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         {orders.map(order => (
                             <>
-                            <tr key={order.orderId}>
+                            <tr className={displayDetail === order.orderId ? 'highlight' : undefined}
+                            key={order.orderId}>
                                 <td><button onClick={() => {changeDetail(order.orderId)}}>
                                     {order.orderId}
                                     </button></td>
@@ -98,8 +110,7 @@ useEffect(() => {
                                 <td>{order.totalCost} kr (Shipping: {order.shippingCost} kr )</td>
                                 <td>{Format.formatDate(order.createdAt)}</td>
                                 <td>
-                                    <button>Ship</button> 
-                                    <button>Cancel & Refund</button>
+                                    {order.status === 0 ? 'Active' : order.status}
                                 </td>
                             </tr>
                             {(displayDetail === order.orderId) ?  DisplayDetail(order): undefined}

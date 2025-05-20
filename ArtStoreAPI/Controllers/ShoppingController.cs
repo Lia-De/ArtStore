@@ -175,8 +175,11 @@ public class ShoppingController(StoreContext context, UserManager<AppUser> userM
         }
         var customer = context.ShopCustomers.FirstOrDefault(c => c.ShopCustomerId == checkout.CustomerId);
         customer.PaymentDetail = checkout.PaymentDetail;
+        customer.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        context.SaveChanges();
+
         decimal shippingCost = checkout.ShippingMethod == "express" ? 150 : 50;
-        var totalCost = shoppingService.CheckoutBasket(shoppingBasket, checkout.CustomerId, shippingCost);
+        var totalCost = shoppingService.CheckoutBasket(shoppingBasket, checkout.CustomerId, shippingCost, checkout.PaymentDetail);
 
         return Ok(totalCost);
     }

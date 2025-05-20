@@ -74,8 +74,34 @@ public class AdminServices(StoreContext context)
             CreatedAt = order.CreatedAt,
             UpdatedAt = order.UpdatedAt,
             ShippedAt = order.ShippedAt,
-            ShippingCost = order.ShippingCost
+            ShippingCost = order.ShippingCost,
+            Status = order.Status,
+            PaymentDetail = order.PaymentDetail
         };
     }
 
+    public bool CancelAndRefund(Order order)
+    {
+        var basket = context.ShoppingBaskets.Include(b => b.BasketItems).ThenInclude(i => i.Inventory).FirstOrDefault(b => b.ShoppingBasketId == order.ShoppingBasketId);
+        if (basket != null)
+        {
+            if (basket.BasketItems != null && basket.BasketItems.Count > 0)
+            {
+                foreach (var item in basket.BasketItems)
+                {
+                    var inventory = context.ArtStoreInventories.FirstOrDefault(i => i.InventoryId == item.InventoryId);
+                    if (inventory != null)
+                    {
+                        inventory.Quantity += item.Quantity;
+                        inventory.UpdatedAt = DateTime.UtcNow;
+                    }
+                }
+            }
+            basket.Status = Status.Cancelled;
+            order.Status = Status.Refunded;
+            context.SaveChanges();
+            return true;
+        }
+        return false;
+    }
 }

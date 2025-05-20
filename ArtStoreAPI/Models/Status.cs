@@ -4,5 +4,8 @@ public enum Status
 {
     Active,
     Cancelled,
-    Purchased
+    Purchased,
+    Shipped, 
+    Refunded,
+    Delivered
 }

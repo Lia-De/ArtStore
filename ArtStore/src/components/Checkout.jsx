@@ -67,7 +67,7 @@ const Checkout = () => {
             customerId: shopCustomer.shopCustomerId,
             shoppingBasketId: shoppingCart.shoppingBasketId,
             paymentDetail: paymentDetail,
-            shoppingMethod: shippingMethod,
+            shippingMethod: shippingMethod,
 
         }
         console.log(order);

@@ -215,4 +215,31 @@ public class AdminController(StoreContext context, UserManager<AppUser> userMana
     {
         return adminServices.OrderToDTO(context.Orders.FirstOrDefault(o => o.OrderId == id));
     }
+    [HttpPost]
+    [Route("admin/order/ship/{id}")]
+    public IActionResult ShipOrder(int id)
+    {
+        var order = context.Orders.FirstOrDefault(o => o.OrderId == id);
+        if (order == null)
+        {
+            return NotFound("Order not found.");
+        }
+        order.ShippedAt = DateTime.Now;
+        context.SaveChanges();
+        return Ok(order);
+    }
+    [HttpPost]
+    [Route("admin/order/cancel/{id}")]
+    public IActionResult CancelOrder(int id)
+    {
+        var order = context.Orders.FirstOrDefault(o => o.OrderId == id);
+        if (order == null)
+        {
+            return NotFound("Order not found.");
+        }
+
+        adminServices.CancelAndRefund(order);
+        
+        return Ok(order);
+    }
 }

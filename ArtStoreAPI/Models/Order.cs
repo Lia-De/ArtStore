@@ -13,6 +13,8 @@ public class Order
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? ShippedAt { get; set; }
     public decimal ShippingCost { get; set; }
+    public string PaymentDetail { get; set; } = string.Empty; // Set dummy values from frontend
+    public Status Status { get; set; } = Status.Active;
 
     public Order()
     {

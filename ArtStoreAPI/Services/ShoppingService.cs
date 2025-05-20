@@ -6,17 +6,17 @@ namespace ArtStoreAPI.Services;
 
 public class ShoppingService(StoreContext context)
 {
-    public decimal CheckoutBasket(ShoppingBasket basket, int customerId, decimal shippingCost)
+    public decimal CheckoutBasket(ShoppingBasket basket, int customerId, decimal shippingCost, string paymentDetail)
     {
         if (basket == null || basket.BasketItems == null || basket.BasketItems.Count == 0)
         {
             throw new InvalidOperationException("Cannot checkout an empty basket.");
         }
 
-        Order order = new(basket, shippingCost) 
-            {
+        Order order = new(basket, shippingCost) {
                 ShopCustomerId = customerId, 
-                ShoppingBasketId = basket.ShoppingBasketId
+                ShoppingBasketId = basket.ShoppingBasketId,
+                PaymentDetail = paymentDetail,
             };
 
         context.Orders.Add(order);
