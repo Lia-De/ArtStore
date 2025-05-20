@@ -204,7 +204,7 @@ export default function ListInventory(){
         <div>
             <h1>Art Store</h1>
             
-            {inventory && !uiState.updating && <h2>Inventory</h2>}
+            {inventory && !uiState.updating && (<h2>Inventory</h2>)}
             {uiState.loading && <p>Loading...</p>}
             {uiState.error && <p>Error: {uiState.error.message}</p>}
             {inventory && !uiState.updating && <>

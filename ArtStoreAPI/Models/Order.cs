@@ -11,7 +11,7 @@ public class Order
     public decimal TotalCost { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime ShippedAt { get; set; }
+    public DateTime? ShippedAt { get; set; }
     public decimal ShippingCost { get; set; }
 
     public Order()

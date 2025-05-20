@@ -63,5 +63,19 @@ public class AdminServices(StoreContext context)
         return maker;
     }
 
+    public OrderDTO OrderToDTO(Order order)
+    {
+        return new OrderDTO
+        {
+            OrderId = order.OrderId,
+            ShoppingBasket = context.ShoppingBaskets.Include(b => b.BasketItems).ThenInclude(inv => inv.Inventory).FirstOrDefault(b => b.ShoppingBasketId == order.ShoppingBasketId),
+            ShopCustomer = context.ShopCustomers.FirstOrDefault(c => c.ShopCustomerId == order.ShopCustomerId).ToDTO(),
+            TotalCost = order.TotalCost,
+            CreatedAt = order.CreatedAt,
+            UpdatedAt = order.UpdatedAt,
+            ShippedAt = order.ShippedAt,
+            ShippingCost = order.ShippingCost
+        };
+    }
 
 }

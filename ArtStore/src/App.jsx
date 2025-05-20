@@ -1,8 +1,8 @@
-import { useState } from 'react'
 
 import './App.css'
 import { BrowserRouter, Routes, Route } from 'react-router'
 import ListInventory from './components/ListInventory.jsx'
+import UpdateOrders from './components/UpdateOrders.jsx'
 import Shopfront from './components/Shopfront.jsx'
 import Navbar from './components/Navbar.jsx'
 import Cart from './components/Cart.jsx'
@@ -16,6 +16,7 @@ function App() {
       {/* <Route path="/" element={<h1>Welcome to the Art Store</h1>} /> */}
       <Route element={<Navbar />} >
         <Route path="/admin" element={<ListInventory />} />
+        <Route path="/admin/orders" element={<UpdateOrders />} />
         <Route path="/" element={<Shopfront />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />

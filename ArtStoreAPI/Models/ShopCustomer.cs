@@ -23,8 +23,12 @@ public class ShopCustomer
     public string PaymentDetail { get; set; } = string.Empty; // Set dummy values from frontend
 
     // add a DTO Conversion
-    public ShopCustomerDTO ToDTO()
+    public ShopCustomerDTO? ToDTO()
     {
+        if (this == null)
+        {
+            return null;
+        }
         return new ShopCustomerDTO
         {
             ShopCustomerId = this.ShopCustomerId,

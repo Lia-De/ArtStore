@@ -174,6 +174,7 @@ public class ShoppingController(StoreContext context, UserManager<AppUser> userM
             return BadRequest("Shopping basket has already been purchased.");
         }
         var customer = context.ShopCustomers.FirstOrDefault(c => c.ShopCustomerId == checkout.CustomerId);
+        customer.PaymentDetail = checkout.PaymentDetail;
         decimal shippingCost = checkout.ShippingMethod == "express" ? 150 : 50;
         var totalCost = shoppingService.CheckoutBasket(shoppingBasket, checkout.CustomerId, shippingCost);
 

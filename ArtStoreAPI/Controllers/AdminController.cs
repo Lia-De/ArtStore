@@ -196,4 +196,23 @@ public class AdminController(StoreContext context, UserManager<AppUser> userMana
         context.SaveChanges();
         return Ok();
     }
+
+    [HttpGet]
+    [Route("admin/orders/all")]
+    public List<Order>? AllOrders()
+    {
+        return context.Orders.ToList();
+    }
+    [HttpGet]
+    [Route("admin/orders/active")]
+    public List<OrderDTO>? AllActiveOrders()
+    {
+        return context.Orders.Where(o => o.ShippedAt == null).Select(or => adminServices.OrderToDTO(or)).ToList();
+    }
+    [HttpGet]
+    [Route("admin/order/{id}")]
+    public OrderDTO? GetOrder(int id)
+    {
+        return adminServices.OrderToDTO(context.Orders.FirstOrDefault(o => o.OrderId == id));
+    }
 }
