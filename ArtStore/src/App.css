@@ -143,3 +143,12 @@ table tr td img {
   justify-content: center;
   align-items: center;
 }
+
+/* Order page  displays */
+table#orders-table {
+  width: 100%;
+  
+} 
+tr.highlight {
+  background-color: rgb(203, 216, 214);
+}
