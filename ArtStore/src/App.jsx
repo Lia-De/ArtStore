@@ -7,6 +7,7 @@ import Shopfront from './components/Shopfront.jsx'
 import Navbar from './components/Navbar.jsx'
 import Cart from './components/Cart.jsx'
 import Checkout from './components/Checkout.jsx'
+import Login from './components/Login.jsx'
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
         <Route path="/" element={<Shopfront />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/login/" element={<Login />} />
       </Route>
       </Routes>
     </BrowserRouter>

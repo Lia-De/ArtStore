@@ -34,8 +34,38 @@ public class ShoppingController(StoreContext context, UserManager<AppUser> userM
         context.ShopCustomers.Add(newCustomer);
         context.SaveChanges();
 
-        return Ok(newCustomer);
+        return Ok(newCustomer.ToDTO());
     }
+
+    [HttpPost]
+    [Route("shopping/login")]
+    public IActionResult Login([FromBody] LoginDTO login)
+    {
+        Console.WriteLine(login.Email);
+        if (login == null)
+        {
+            return BadRequest("Invalid login data.");
+        }
+        if (string.IsNullOrEmpty(login.Email))
+        {
+            return BadRequest("Email is required.");
+        }
+        if (string.IsNullOrEmpty(login.Password))
+        {
+            return BadRequest("Password is required.");
+        }
+        var customer = context.ShopCustomers.FirstOrDefault(c => c.Email == login.Email);
+        if (customer == null)
+        {
+            return NotFound("Customer not found.");
+        }
+        if (login.Password != customer.Password)
+        {
+            return Unauthorized("Invalid password.");
+        }
+        return Ok(customer.ToDTO());
+    }
+
 
     [HttpGet]
     [Route("shopping/getUserProfile/{userId}")]

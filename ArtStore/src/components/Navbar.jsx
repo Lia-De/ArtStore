@@ -5,7 +5,7 @@ import { NavLink, Outlet, useLocation } from "react-router";
 import { MdScreenLockLandscape } from "react-icons/md";
 
 export const Navbar = () => {
-    const {shopCustomer} = useAtomValue(shopCustomerAtom);
+    const [shopCustomer, setShopCustomer] = useAtom(shopCustomerAtom);
     const [shoppingCart, setShoppingCart] = useAtom(shoppingCartAtom);
     const location = useLocation();
 

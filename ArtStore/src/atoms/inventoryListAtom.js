@@ -1,5 +1,6 @@
+import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 
-export const inventoryListAtom = atomWithStorage("inventory", []);
+export const inventoryListAtom = atom("inventory", []);
 export const makerListAtom = atomWithStorage("makerList", []);
-export const singleInventoryAtom = atomWithStorage("singleInventory", {});
+export const singleInventoryAtom = atom("singleInventory", {});
