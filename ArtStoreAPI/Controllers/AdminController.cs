@@ -207,7 +207,19 @@ public class AdminController(StoreContext context, UserManager<AppUser> userMana
     [Route("admin/orders/active")]
     public List<OrderDTO>? AllActiveOrders()
     {
-        return context.Orders.Where(o => o.ShippedAt == null).Select(or => adminServices.OrderToDTO(or)).ToList();
+        return context.Orders.Where(o => o.Status == Status.Active).Select(or => adminServices.OrderToDTO(or)).ToList();
+    }
+    [HttpGet]
+    [Route("admin/orders/refunded")]
+    public List<OrderDTO>? AllRefundedOrders()
+    {
+        return context.Orders.Where(o => o.Status == Status.Refunded).Select(or => adminServices.OrderToDTO(or)).ToList();
+    }
+    [HttpGet]
+    [Route("admin/orders/shipped")]
+    public List<OrderDTO>? AllShippedOrders()
+    {
+        return context.Orders.Where(o => o.Status == Status.Shipped).Select(or => adminServices.OrderToDTO(or)).ToList();
     }
     [HttpGet]
     [Route("admin/order/{id}")]
@@ -225,12 +237,13 @@ public class AdminController(StoreContext context, UserManager<AppUser> userMana
             return NotFound("Order not found.");
         }
         order.ShippedAt = DateTime.Now;
+        order.Status = Status.Shipped;
         context.SaveChanges();
-        return Ok(order);
+        return Ok();
     }
     [HttpPost]
-    [Route("admin/order/cancel/{id}")]
-    public IActionResult CancelOrder(int id)
+    [Route("admin/order/refund/{id}")]
+    public IActionResult RefundlOrder(int id)
     {
         var order = context.Orders.FirstOrDefault(o => o.OrderId == id);
         if (order == null)
@@ -238,8 +251,9 @@ public class AdminController(StoreContext context, UserManager<AppUser> userMana
             return NotFound("Order not found.");
         }
 
-        adminServices.CancelAndRefund(order);
+        var result = adminServices.CancelAndRefund(order);
         
-        return Ok(order);
+        return Ok(result);
     }
+
 }
