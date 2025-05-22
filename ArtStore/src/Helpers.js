@@ -10,3 +10,11 @@ export function formatDate(timeStamp) {
     return date.toLocaleTimeString() +' '+ date.toLocaleDateString(); // returns date and time in local format
 
 }
+export const statusLabels = {
+  0: 'Active',
+  1: 'Cancelled',
+  2: 'Purchased',
+  3: 'Shipped',
+  4: 'Refunded',
+  5: 'Delivered'
+};

@@ -33,7 +33,7 @@ const Checkout = () => {
         }
     }, []);
     useEffect(() => {
-        console.log('cart', shoppingCart);
+        // console.log('cart', shoppingCart);
         shopCustomer?.shopCustomerId && paymentDetail && shippingMethod && setPurchaseCheck(true);
         if (shippingMethod) {
             if (shippingMethod === "standard") {
@@ -70,7 +70,7 @@ const Checkout = () => {
             shippingMethod: shippingMethod,
 
         }
-        console.log(order);
+        // console.log(order);
         axios.post(`${apiUrl}/shopping/checkout`, order)
         .then((result)=>{
             // console.log(result.data);

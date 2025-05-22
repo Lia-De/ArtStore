@@ -28,8 +28,6 @@ export const Navbar = () => {
                 <li>
                     <NavLink to="/" className="navbar-item">Shop</NavLink>
                 </li>
-                {shopCustomer && <li>
-                    <NavLink to="/mypage" className="navbar-item">My page</NavLink></li>}
                 <li>
                     <NavLink to="/cart" className="navbar-item">Cart</NavLink></li>
                 <li>

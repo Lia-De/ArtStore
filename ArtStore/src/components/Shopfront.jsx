@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { inventoryListAtom, makerListAtom } from "../atoms/inventoryListAtom.js";
+import { inventoryListAtom } from "../atoms/inventoryListAtom.js";
 import { shopCustomerAtom } from "../atoms/shopCustomerAtom.js";
 import { shoppingCartAtom } from "../atoms/cartAtom.js";
 
@@ -26,12 +26,12 @@ const Shopfront = () => {
     useEffect(() => {
         // console.log('cart', shoppingCart);
         // console.log('customer', shopCustomer);
+        // console.log('inventory', inventory);
         
         setUiState(prev => ({...prev, loading: true, error: null}));
-        fetch(`${apiUrl}/shopping/listInventories`)
-            .then((response) => response.json())
-            .then((data) => {
-                setInventory(data);
+        axios.get(`${apiUrl}/shopping/listInventories`)
+            .then((response) => {
+                setInventory(response.data);
                 
             })
             .catch((err) => { 
@@ -55,10 +55,10 @@ const Shopfront = () => {
             "inventoryId": inventoryId,
             "quantity": 1
           }
-        console.log(cartItem);
+        // console.log(cartItem);
         axios.post(`${apiUrl}/shopping/addToBasket`, cartItem)
         .then((result)=>{
-            console.log(result.data);
+            // console.log(result.data);
             setShoppingCart(result.data);
             setUiState(prev => ({...prev, updating: false}));
             // update the inventory list to reflect the new quantity

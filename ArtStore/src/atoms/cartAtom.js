@@ -1,4 +1,4 @@
-import { atom } from "jotai";
+import { atomWithStorage } from "jotai/utils";
 
 
-export const shoppingCartAtom = atom("shoppingCart", []);
+export const shoppingCartAtom = atomWithStorage("shoppingCart", []);

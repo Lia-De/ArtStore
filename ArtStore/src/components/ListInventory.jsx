@@ -66,9 +66,9 @@ export default function ListInventory(){
                 alert("Upload failed: " + (error.response?.data || error.message));
             }
             
-            console.log(imageresult.data);
+            // console.log(imageresult.data);
             const imageUrl = imageresult ? `${apiUrl}/images/${imageresult.data}` : data.imageUrl;
-            console.log(imageUrl);
+            // console.log(imageUrl);
 
             const newInventory = {
                 Name: data.name,
