@@ -121,33 +121,29 @@ useEffect(() => {
 
     return (
         <div>
-            <h1>Update Orders</h1>
-                <button
-                onClick={() => {
-                    setUiState(prev => ({
-                        ...prev, 
-                        loadingOrders: 'active', 
-                        reload: true}))}
-                    }>Active Orders</button>
-                <button
-                onClick={() => {
-                    setUiState(prev => ({
-                        ...prev, 
-                        loadingOrders: 'shipped', 
-                        reload: true}))}
-                    }>Shipped Orders</button>
-                
-                <button
-                onClick={() => {
-                    setUiState(prev => ({
-                        ...prev, 
-                        loadingOrders: 'refunded', 
-                        reload: true}))}
-                    }>Refunded Orders</button>
+                <button className={uiState.loadingOrders === 'active' ? undefined: 'inactive'}
+                onClick={() => { setUiState(prev => ({ ...prev, reload:true,
+                        loadingOrders: 'active'}))}}>
+                    Active Orders</button>
+                <button   className={uiState.loadingOrders === 'shipped' ? undefined: 'inactive'}
+                onClick={() => { setUiState(prev => ({...prev, reload: true,
+                        loadingOrders: 'shipped'}))}}>
+                    Shipped Orders</button>
+                <button className={uiState.loadingOrders === 'refunded' ? undefined: 'inactive'}
+                 onClick={() => { setUiState(prev => ({ ...prev, reload:true,
+                        loadingOrders: 'refunded'}))}}>
+                    Refunded Orders</button>
+                <button  className={uiState.loadingOrders === 'all' ? undefined: 'inactive'}
+                 onClick={() => { setUiState(prev => ({ ...prev, reload:true,
+                    loadingOrders: 'all'}))}}>
+                All Orders</button>
 
+
+                <h1>{uiState.loadingOrders.charAt(0).toUpperCase() + uiState.loadingOrders.slice(1)} Orders</h1>
             {uiState.loading && <p>Loading...</p>}
             {uiState.error && <p>Error: {uiState.error.message}</p>}
             {orders.length > 0 ? (
+                <>
                 <table id="orders-table">
                     <thead>
                         <tr>
@@ -162,7 +158,7 @@ useEffect(() => {
                         {orders.map(order => (
                             <>
                             <tr className={displayDetail === order.orderId ? 'highlight' : undefined}
-                            key={`order-${order.orderId}`}>
+                            key={`orderList-${order.orderId}`}>
                                 <td><button onClick={() => {changeDetail(order.orderId)}}>
                                     {order.orderId}
                                     </button></td>
@@ -178,6 +174,7 @@ useEffect(() => {
                         ))}
                     </tbody>
                 </table>
+                </>
             ) : (
                 <>
                 <p>No active orders found.</p>

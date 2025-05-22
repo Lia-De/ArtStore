@@ -152,3 +152,8 @@ table#orders-table {
 tr.highlight {
   background-color: rgb(203, 216, 214);
 }
+
+button.inactive{
+  background-color: rgb(218, 218, 218);
+  color: black;
+}

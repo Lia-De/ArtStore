@@ -18,6 +18,7 @@ public class AdminController(StoreContext context, UserManager<AppUser> userMana
         .Include(t => t.Tags)
         .Include(m => m.Maker)
         .AsNoTracking()
+        .Where(i => i.IsDeleted == false && i.Quantity > 0)
         .ToList()
         .Select(inventory => inventory.ToDTO())
         .ToList();
@@ -162,6 +163,44 @@ public class AdminController(StoreContext context, UserManager<AppUser> userMana
     }
 
     [HttpPost]
+    [Route("admin/inventory/update/{id}")]
+    public IActionResult UpdateInventory(int id, [FromBody] InventoryDTO inventory)
+    {
+        var existingInventory = context.ArtStoreInventories.Include(t => t.Tags).Include(m => m.Maker).FirstOrDefault(i => i.InventoryId == id);
+        if (existingInventory == null)
+        {
+            return NotFound("Inventory not found.");
+        }
+
+        
+        if (inventory == null)
+        {
+            return BadRequest("Invalid inventory data.");
+        }
+        if (inventory.Name.IsNullOrEmpty())
+        {
+            return BadRequest("Name required.");
+        }
+        if (inventory.Price <= 0)
+        {
+            return BadRequest("Price must be greater than 0.");
+        }
+
+        var tagList = adminServices.CreateTags(inventory.Tags);
+
+        existingInventory.Name = inventory.Name;
+        existingInventory.Description = inventory.Description;
+        existingInventory.Price = inventory.Price;
+        existingInventory.Quantity = inventory.Quantity;
+        existingInventory.ImageUrl = inventory.ImageUrl;
+        existingInventory.Tags = tagList;
+        existingInventory.UpdatedAt = DateTime.Now;
+
+        context.SaveChanges();
+        return Ok(existingInventory.ToDTO());
+    }
+
+    [HttpPost]
     [Route("admin/inventoryRemoveTag")]
     public IActionResult InventoryRemoveTag(int inventoryId, int tagId)
     {
@@ -180,7 +219,7 @@ public class AdminController(StoreContext context, UserManager<AppUser> userMana
         return Ok(inventory);
     }
     [HttpDelete]
-    [Route("admin/inventory_delete/{id}")]
+    [Route("admin/inventory/delete/{id}")]
     public IActionResult DeleteInventory(int id)
     {
         var inventory = context.ArtStoreInventories.Include(t => t.Tags).Include(m => m.Maker).FirstOrDefault(i => i.InventoryId == id);
@@ -199,9 +238,9 @@ public class AdminController(StoreContext context, UserManager<AppUser> userMana
 
     [HttpGet]
     [Route("admin/orders/all")]
-    public List<Order>? AllOrders()
+    public List<OrderDTO>? AllOrders()
     {
-        return context.Orders.ToList();
+        return context.Orders.Select(or => adminServices.OrderToDTO(or)).ToList();
     }
     [HttpGet]
     [Route("admin/orders/active")]

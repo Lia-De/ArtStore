@@ -86,6 +86,7 @@ public class ShoppingController(StoreContext context, UserManager<AppUser> userM
             .Include(t => t.Tags)
             .Include(m => m.Maker)
             .AsNoTracking()
+            .Where(i => i.IsDeleted == false)
             .ToList()
             .Select(inventory => inventory.ToDTO())
             .ToList();

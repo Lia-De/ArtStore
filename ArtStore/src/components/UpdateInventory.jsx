@@ -1,26 +1,69 @@
-import React, {useEffect, useState} from 'react';
-import { set, useForm } from 'react-hook-form';
+import axios from 'axios';
+import { apiUrl } from '../config.js';
+import {useEffect, useState} from 'react';
+import { useForm } from 'react-hook-form';
 
 export const UpdateInventory = ( {item, setItem, setUiState} ) => {
     const {register, handleSubmit} = useForm();
-       
-    const onSubmit = (data) => {
-        setUiState(prev => ({...prev, updating: false}));
-        console.log(data);
+    const [updated, setUpdated] = useState(false);
+    const [updatedItem, setUpdatedItem] = useState(null);
+
+    const onSubmit = async (data) => {
+        
+        // console.log(data);
         // Call the API to update the item..
-        setItem(prev => ({...prev, 
-            name: data.name
-            , description: data.description
-            , quantity: data.quantity
-            , price: data.price
-            , imageUrl: data.imageUrl
-            , tags: data.tags.split(",").map(tag => ({name: tag.trim()}))
+           var imageresult = null;
             
-    }));
-    console.log(item)
+        if (data.imageUpload[0] != null) { 
+               const formData = new FormData();
+            formData.append("imageUpload", data.imageUpload[0]); 
+            // console.log(formData);
+            try {
+                imageresult = await axios.post(
+                    `${apiUrl}/admin/uploadImage`, 
+                    formData
+                );
+            } catch (error) {
+                console.error("Upload failed:", error);
+                alert("Upload failed: " + (error.response?.data || error.message));
+            }
+        }
+        const imageUrl = imageresult ? `${apiUrl}/images/${imageresult.data}` : data.imageUrl;
+            
+
+        setUpdatedItem(()=> ({ 
+            inventoryId: item.inventoryId
+            , name: data.name
+            , description: data.description
+            , quantity: Number(data.quantity)
+            , price: Number(data.price)
+            , imageUrl: imageUrl
+            , tags: data.tags.split(",").map(tag => tag.trim()),
+            }));
+        setUpdated(true);
 }
 
-    useEffect(() => {console.log(item);}, [item]);
+    useEffect(() => {
+        if (updated) {
+            axios.post(`${apiUrl}/admin/inventory/update/${updatedItem.inventoryId}`, updatedItem, {
+                headers: {
+                  'Content-Type': 'application/json',
+                }
+            })
+            .then((response) => {
+                console.log("Item updated", response.data);
+                // Perhaps need to check the result - some fields may not be updated
+                setUpdated(false);
+            })
+            .catch((err) => {
+                console.error("Error updating item", err);
+                setUiState(prev => ({...prev, error: err.response.data}));
+            })
+            .finally(() => {
+                setUiState(prev => ({...prev, updating: false, reload: true}));
+            });
+        }
+    }, [updated]);
 
     return ( item &&
         <div className='update-inventory'>
@@ -40,6 +83,12 @@ export const UpdateInventory = ( {item, setItem, setUiState} ) => {
 
                 <label htmlFor="imageUrl">Image URL:</label>
                 <input type="text" id="imageUrl" defaultValue={item.imageUrl} {...register("imageUrl")} />
+                
+                <label htmlFor="imageUpload">Upload image:</label>
+                <input type="file" id="imageUpload" accept="image/*"   
+                    {...register("imageUpload", {
+                        onChange: (e) => {  return e.target.files; }
+                    })} />
 
                 <label htmlFor="tags">Tags:</label>
                 <input type="text" id="tags" defaultValue={item.tags?.map(item => item.name)} {...register("tags")} />

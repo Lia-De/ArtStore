@@ -45,13 +45,11 @@ export default function ListInventory(){
     
 
     function AddNewInventory(){
-        const [selectedFile, setSelectedFile] = useState(null);
-
         
         const onSubmit = async (data) => {
             // console.log(data.imageUpload[0])
             var imageresult = null;
-            
+            if (data.imageUpload[0] != null) {
             const formData = new FormData();
             formData.append("imageUpload", data.imageUpload[0]); 
             // console.log(formData);
@@ -65,7 +63,7 @@ export default function ListInventory(){
                 console.error("Upload failed:", error);
                 alert("Upload failed: " + (error.response?.data || error.message));
             }
-            
+            }
             // console.log(imageresult.data);
             const imageUrl = imageresult ? `${apiUrl}/images/${imageresult.data}` : data.imageUrl;
             // console.log(imageUrl);
@@ -97,7 +95,6 @@ export default function ListInventory(){
                 }
               })
             .then(() => {
-                // setInventory(prev => [...prev, response.data]);
                 setUiState(prev => ({...prev, reload: true}));
             })
             .catch ((err) => {
@@ -164,10 +161,10 @@ export default function ListInventory(){
 
     const updateItem = (item) => {
         
-        setUiState(prev => ({...prev, loading: true, updating: true}));
+        setUiState(prev => ({...prev, loading: true, updating: true, error: null}));
 
         setSingleInventory({});
-        console.log(item);
+        // console.log(item);
         axios.get(`${apiUrl}/admin/inventory/${item}`)
         .then((response) => {
             setSingleInventory(response.data);
@@ -180,6 +177,24 @@ export default function ListInventory(){
             setUiState(prev => ({...prev, loading: false}));
         });
 
+    }
+
+    const deleteInventory = (item) => {
+        setUiState(prev => ({...prev, loading: true, error: null}));
+        axios.delete(`${apiUrl}/admin/inventory/delete/${item}`)
+        .then((result) => {
+            if (result.data == true) {
+                setInventory(prev => prev.filter(item => item.inventoryId !== item));
+            }
+            setUiState(prev => ({...prev, reload: true}));
+        })
+        .catch ((err) => {
+            console.error(err.response?.data || err.message);
+            setUiState(prev => ({...prev, error: err}));
+        })
+        .finally(() => { 
+            setUiState(prev => ({...prev, loading: false}));
+        });
     }
 
     const inventoryElements = inventory.map((item) => {
@@ -195,18 +210,20 @@ export default function ListInventory(){
                 <p>Last update: {Format.formatUnixTime(item.updatedAt)}</p>
                 <p>Tags: {item.tags.join(", ")}</p>
                 <button onClick={() => updateItem(item.inventoryId) }>Update</button>
-                <button onClick={() => {}}>Delete</button>
+                <button
+                disabled={item.currentlyInBaskets > 0 ? true : false}
+                className={item.currentlyInBaskets > 0 ? 'disabled' : undefined}
+                 onClick={() => {deleteInventory(item.inventoryId)}}>Delete</button>
             </div>
         );
     })
 
     return (
         <div>
-            <h1>Art Store</h1>
             
-            {inventory && !uiState.updating && (<h2>Inventory</h2>)}
+            {inventory && !uiState.updating && (<h1>Inventory Management</h1>)}
             {uiState.loading && <p>Loading...</p>}
-            {uiState.error && <p>Error: {uiState.error.message}</p>}
+            {uiState.error && <p>Error: {uiState.error.message ? uiState.error.message: uiState.error}</p>}
             {inventory && !uiState.updating && <>
                 <div className='inventory-list'>
                     {inventoryElements}
