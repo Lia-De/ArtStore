@@ -29,10 +29,12 @@ export const Navbar = () => {
                     <NavLink to="/" className="navbar-item">Shop</NavLink>
                 </li>
                 <li>
-                    <NavLink to="/cart" className="navbar-item">Cart</NavLink></li>
-                <li>
+                    <NavLink to="/cart" className="navbar-item">Cart </NavLink>{shoppingCart && (shoppingCart?.totalPrice + ' kr')}</li>
+                {shopCustomer && (<li> User: {shopCustomer.firstname} </li>)}
+                {/* <li>
                     <NavLink to="/login" className="navbar-item">Login</NavLink>
-                </li></>
+                </li> */}
+                </>
                 )}
             </ul>
         </nav>

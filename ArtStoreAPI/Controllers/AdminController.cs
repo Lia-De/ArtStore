@@ -186,12 +186,15 @@ public class AdminController(StoreContext context, UserManager<AppUser> userMana
             return BadRequest("Price must be greater than 0.");
         }
 
+
         var tagList = adminServices.CreateTags(inventory.Tags);
+        if (existingInventory.CurrentlyInBaskets <= inventory.Quantity) { 
+            existingInventory.Quantity = inventory.Quantity;
+        }
 
         existingInventory.Name = inventory.Name;
         existingInventory.Description = inventory.Description;
         existingInventory.Price = inventory.Price;
-        existingInventory.Quantity = inventory.Quantity;
         existingInventory.ImageUrl = inventory.ImageUrl;
         existingInventory.Tags = tagList;
         existingInventory.UpdatedAt = DateTime.Now;

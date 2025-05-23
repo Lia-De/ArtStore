@@ -104,7 +104,7 @@ if ( uiState.viewList){
     return (
         <div className="shopfront">
             <h1>Welcome to the Shop</h1>
-            <p>Here you can find all the items available for sale.</p>
+            
             <div className="inventory-list">
                 {inventory?.map((item) => (
                     <div key={`inventory${item.inventoryId}`} className="inventory-item" onClick={() => InventoryDetails({item})}>

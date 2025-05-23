@@ -4,7 +4,7 @@ import {useEffect, useState} from 'react';
 import { useForm } from 'react-hook-form';
 
 export const UpdateInventory = ( {item, setItem, setUiState} ) => {
-    const {register, handleSubmit} = useForm();
+    const {register, handleSubmit,  formState: { errors }} = useForm();
     const [updated, setUpdated] = useState(false);
     const [updatedItem, setUpdatedItem] = useState(null);
 
@@ -51,7 +51,7 @@ export const UpdateInventory = ( {item, setItem, setUiState} ) => {
                 }
             })
             .then((response) => {
-                console.log("Item updated", response.data);
+                // console.log("Item updated", response.data);
                 // Perhaps need to check the result - some fields may not be updated
                 setUpdated(false);
             })
@@ -76,8 +76,11 @@ export const UpdateInventory = ( {item, setItem, setUiState} ) => {
                 <input type="text" id="description" defaultValue={item.description} {...register("description")} />
 
                 <label htmlFor="quantity">Quantity:</label>
-                <input type="text" id="quantity" defaultValue={item.quantity} {...register("quantity")} />
-
+                <input type="number" id="quantity" defaultValue={item.quantity} 
+                    {...register("quantity", { valueAsNumber: true,
+                            validate: (value) =>
+                            value >= item.currentlyInBaskets || `Value must be at least ${item.currentlyInBaskets}`,  })} />
+                {errors.quantity && <p className="formerror">{errors.quantity.message}</p>}
                 <label htmlFor="price">Price:</label>
                 <input type="number" id="price"  defaultValue={item.price}{...register("price")} />
 
