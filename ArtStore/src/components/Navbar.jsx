@@ -29,7 +29,7 @@ export const Navbar = () => {
                     <NavLink to="/" className="navbar-item">Shop</NavLink>
                 </li>
                 <li>
-                    <NavLink to="/cart" className="navbar-item">Cart </NavLink>{shoppingCart && (shoppingCart?.totalPrice + ' kr')}</li>
+                    <NavLink to="/cart" className="navbar-item">Cart </NavLink>{shoppingCart && (shoppingCart?.totalPrice? shoppingCart.totalPrice + ' kr': '')}</li>
                 {shopCustomer && (<li> User: {shopCustomer.firstname} </li>)}
                 {/* <li>
                     <NavLink to="/login" className="navbar-item">Login</NavLink>
@@ -42,9 +42,9 @@ export const Navbar = () => {
         <footer className="navbar-footer">
             <p>&copy; 2025 Art Store. All rights reserved.</p>
              {isAdminPage ? (
-                <NavLink to="/" className="navbar-item">Log out to shop</NavLink>
+                <p><NavLink to="/" className="navbar-item">Log out to shop</NavLink></p>
                 ) : (
-                    <NavLink to="/admin" className="navbar-item"><MdScreenLockLandscape size="24" />Admin</NavLink>
+                    <p><NavLink to="/admin" className="navbar-item"><MdScreenLockLandscape size="14" /> Admin</NavLink></p>
                 )}
         </footer>
         </>

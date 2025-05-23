@@ -30,7 +30,7 @@ button {
   border-radius: 0.4em;
 }
 .inventory-item:hover {
-  background-color: rgb(203, 216, 214);
+  background-color: var(--higlightGreen);
 }
 
 form {
@@ -113,6 +113,10 @@ ul.navbar-menu li {
   grid-column: 1/4;
   text-align: center;
 }
+.cart > p{
+  grid-column: 1/4;
+  text-align: center;
+}
 .soldout {
   font-variant: small-caps;
   color: rgb(255, 0, 0);
@@ -138,7 +142,8 @@ table tr td img {
   text-align: left;
 }
 .disabled {
-  opacity: 0.6;
+  background-color: rgb(218, 218, 218);
+  color: black;
   cursor: not-allowed;
 }
 .checkout_container_confirm {
@@ -155,7 +160,7 @@ table#orders-table {
   
 } 
 tr.highlight {
-  background-color: rgb(203, 216, 214);
+  background-color: var(--higlightGreen);
 }
 
 button.inactive{

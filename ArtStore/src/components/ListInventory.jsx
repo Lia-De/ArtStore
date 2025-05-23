@@ -212,7 +212,7 @@ export default function ListInventory(){
                 <button onClick={() => updateItem(item.inventoryId) }>Update</button>
                 <button
                 disabled={item.currentlyInBaskets > 0 ? true : false}
-                className={item.currentlyInBaskets > 0 ? 'disabled' : undefined}
+                className={item.currentlyInBaskets > 0 ? 'inactive' : undefined}
                  onClick={() => {deleteInventory(item.inventoryId)}}>Delete</button>
             </div>
         );

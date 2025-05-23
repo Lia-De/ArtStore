@@ -91,7 +91,7 @@ if (uiState.viewItem) {
             <p>Maker: {uiState.item.maker?.firstname + ' ' + uiState.item.maker?.lastname} </p>
             <p>Tags: {uiState.item.tags.join(", ")}</p>
                 <button 
-                    className={uiState.item.quantity==0 ? "soldout" : undefined} 
+                    className={uiState.item.quantity==0 ? "disabled" : undefined} 
                     disabled={uiState.item.quantity==0 ? true: false} 
                     onClick={()=> AddToCart(uiState.item.inventoryId)}>
                         {uiState.updating ? "Adding ...": "Add to Cart"}
