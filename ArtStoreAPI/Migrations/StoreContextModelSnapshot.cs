@@ -106,6 +106,9 @@ namespace ArtStoreAPI.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("MakerId")
                         .HasColumnType("INTEGER");
 
@@ -135,8 +138,8 @@ namespace ArtStoreAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("InventoryId")
                         .HasColumnType("INTEGER");
@@ -150,10 +153,12 @@ namespace ArtStoreAPI.Migrations
                     b.Property<int>("ShoppingBasketId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("UpdatedAt")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("BasketItemId");
+
+                    b.HasIndex("InventoryId");
 
                     b.HasIndex("ShoppingBasketId");
 
@@ -194,7 +199,11 @@ namespace ArtStoreAPI.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("ShippedAt")
+                    b.Property<string>("PaymentDetail")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ShippedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("ShippingCost")
@@ -204,6 +213,9 @@ namespace ArtStoreAPI.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("ShoppingBasketId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
                     b.Property<decimal>("TotalCost")
@@ -237,8 +249,8 @@ namespace ArtStoreAPI.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -252,6 +264,10 @@ namespace ArtStoreAPI.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("PaymentDetail")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -260,8 +276,8 @@ namespace ArtStoreAPI.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("UpdatedAt")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -282,8 +298,11 @@ namespace ArtStoreAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("ShopCustomerId")
                         .HasColumnType("INTEGER");
@@ -294,12 +313,8 @@ namespace ArtStoreAPI.Migrations
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<long>("UpdatedAt")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("ShoppingBasketId");
 
@@ -496,11 +511,19 @@ namespace ArtStoreAPI.Migrations
 
             modelBuilder.Entity("ArtStoreAPI.Models.BasketItem", b =>
                 {
+                    b.HasOne("ArtStoreAPI.Models.ArtStoreInventory", "Inventory")
+                        .WithMany()
+                        .HasForeignKey("InventoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ArtStoreAPI.Models.ShoppingBasket", null)
                         .WithMany("BasketItems")
                         .HasForeignKey("ShoppingBasketId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Inventory");
                 });
 
             modelBuilder.Entity("ArtStoreAPI.Models.Order", b =>
